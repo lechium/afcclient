@@ -6,16 +6,19 @@ A simple CLI interface to AFC via libimobiledevice.
 
 ## Requirements
 
-- libimobiledevice (v 1.1.5+)
+- libimobiledevice (v 1.1.5+) (windows and mac libs included)
   https://github.com/libimobiledevice/libimobiledevice
 
-- For building, clang is also required (support for Blocks).
-
-- On Linux you will need the BlocksRuntime development libs. On Ubuntu the package is called 'libblocksruntime-dev'.
+- if building for windows you will need mingw (http://mingw.org/wiki/Getting_Started)
 
 ## Building
 
     $ make
+
+## Running
+
+    if you are using the included libraries for mac / windows you will need to copy them into the same location
+    as afcclient binary
 
 ## Usage
 
@@ -27,8 +30,17 @@ A simple CLI interface to AFC via libimobiledevice.
         -u, --uuid=<UDID>          Specify the device udid
         -v, --verbose              Enable verbose debug messages
         -h, --help                 Display this help message
+        -l, --list                 List devices
+        -c, --clean                Cleans out folder after exporting/cloning
+
+      New commands:
+
+        clone  [localpath]         clone Documents folder into a local folder. (requires appid)
+        export [path] [localpath]  export a specific directory to a local one (not recursive)
+        documents                  recursive plist formatted list of entire ~/Documents folder (requires appid)
 
       Where "command" and "cmdargs..." are as folows:
+
         devinfo                    dump device info from AFC server
         ls <dir> [dir2...]         list remote directory contents
         info <path> [path2...]     dump remote file information
@@ -50,6 +62,8 @@ A simple CLI interface to AFC via libimobiledevice.
 
 Eric Monti - esmonti at gmail dot com
 
+tweaked by Kevin Bradley to remove clang requirement, include built libs for mac and windows (32 bit only for windows)
+and added some improved recursive listing functionality with plist output.
 
 ## License
 

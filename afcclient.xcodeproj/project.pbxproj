@@ -1,0 +1,329 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		8933D6531A1E7F6C009182A9 /* afcclient.c in Sources */ = {isa = PBXBuildFile; fileRef = 8933D64F1A1E7F6C009182A9 /* afcclient.c */; };
+		8933D6541A1E7F6C009182A9 /* libidev.c in Sources */ = {isa = PBXBuildFile; fileRef = 8933D6511A1E7F6C009182A9 /* libidev.c */; };
+		8933D65D1A1E7FC4009182A9 /* libcrypto.1.0.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 8933D6551A1E7FC4009182A9 /* libcrypto.1.0.0.dylib */; };
+		8933D65E1A1E7FC4009182A9 /* libiconv.2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 8933D6561A1E7FC4009182A9 /* libiconv.2.dylib */; };
+		8933D65F1A1E7FC4009182A9 /* libimobiledevice.4.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 8933D6571A1E7FC4009182A9 /* libimobiledevice.4.dylib */; };
+		8933D6601A1E7FC4009182A9 /* libplist.2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 8933D6581A1E7FC4009182A9 /* libplist.2.dylib */; };
+		8933D6611A1E7FC4009182A9 /* libssl.1.0.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 8933D6591A1E7FC4009182A9 /* libssl.1.0.0.dylib */; };
+		8933D6621A1E7FC4009182A9 /* libusbmuxd.2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 8933D65A1A1E7FC4009182A9 /* libusbmuxd.2.dylib */; };
+		8933D6631A1E7FC4009182A9 /* libxml2.2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 8933D65B1A1E7FC4009182A9 /* libxml2.2.dylib */; };
+		8933D6641A1E7FC4009182A9 /* libz.1.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 8933D65C1A1E7FC4009182A9 /* libz.1.dylib */; };
+		8933D66D1A1E7FD1009182A9 /* libcrypto.1.0.0.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8933D6651A1E7FD1009182A9 /* libcrypto.1.0.0.dylib */; };
+		8933D66E1A1E7FD1009182A9 /* libiconv.2.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8933D6661A1E7FD1009182A9 /* libiconv.2.dylib */; };
+		8933D66F1A1E7FD1009182A9 /* libimobiledevice.4.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8933D6671A1E7FD1009182A9 /* libimobiledevice.4.dylib */; };
+		8933D6701A1E7FD1009182A9 /* libplist.2.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8933D6681A1E7FD1009182A9 /* libplist.2.dylib */; };
+		8933D6711A1E7FD1009182A9 /* libssl.1.0.0.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8933D6691A1E7FD1009182A9 /* libssl.1.0.0.dylib */; };
+		8933D6721A1E7FD1009182A9 /* libusbmuxd.2.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8933D66A1A1E7FD1009182A9 /* libusbmuxd.2.dylib */; };
+		8933D6731A1E7FD1009182A9 /* libxml2.2.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8933D66B1A1E7FD1009182A9 /* libxml2.2.dylib */; };
+		8933D6741A1E7FD1009182A9 /* libz.1.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8933D66C1A1E7FD1009182A9 /* libz.1.dylib */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		8933D6431A1E7F1B009182A9 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 12;
+			dstPath = "";
+			dstSubfolderSpec = 6;
+			files = (
+				8933D66D1A1E7FD1009182A9 /* libcrypto.1.0.0.dylib in CopyFiles */,
+				8933D66E1A1E7FD1009182A9 /* libiconv.2.dylib in CopyFiles */,
+				8933D66F1A1E7FD1009182A9 /* libimobiledevice.4.dylib in CopyFiles */,
+				8933D6701A1E7FD1009182A9 /* libplist.2.dylib in CopyFiles */,
+				8933D6711A1E7FD1009182A9 /* libssl.1.0.0.dylib in CopyFiles */,
+				8933D6721A1E7FD1009182A9 /* libusbmuxd.2.dylib in CopyFiles */,
+				8933D6731A1E7FD1009182A9 /* libxml2.2.dylib in CopyFiles */,
+				8933D6741A1E7FD1009182A9 /* libz.1.dylib in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		8933D6451A1E7F1B009182A9 /* afcclient */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = afcclient; sourceTree = BUILT_PRODUCTS_DIR; };
+		8933D64F1A1E7F6C009182A9 /* afcclient.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = afcclient.c; sourceTree = "<group>"; };
+		8933D6501A1E7F6C009182A9 /* afcclient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = afcclient.h; sourceTree = "<group>"; };
+		8933D6511A1E7F6C009182A9 /* libidev.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = libidev.c; sourceTree = "<group>"; };
+		8933D6521A1E7F6C009182A9 /* libidev.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = libidev.h; sourceTree = "<group>"; };
+		8933D6551A1E7FC4009182A9 /* libcrypto.1.0.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcrypto.1.0.0.dylib; path = afcclient/mac_libs/libcrypto.1.0.0.dylib; sourceTree = "<group>"; };
+		8933D6561A1E7FC4009182A9 /* libiconv.2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libiconv.2.dylib; path = afcclient/mac_libs/libiconv.2.dylib; sourceTree = "<group>"; };
+		8933D6571A1E7FC4009182A9 /* libimobiledevice.4.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libimobiledevice.4.dylib; path = afcclient/mac_libs/libimobiledevice.4.dylib; sourceTree = "<group>"; };
+		8933D6581A1E7FC4009182A9 /* libplist.2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libplist.2.dylib; path = afcclient/mac_libs/libplist.2.dylib; sourceTree = "<group>"; };
+		8933D6591A1E7FC4009182A9 /* libssl.1.0.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libssl.1.0.0.dylib; path = afcclient/mac_libs/libssl.1.0.0.dylib; sourceTree = "<group>"; };
+		8933D65A1A1E7FC4009182A9 /* libusbmuxd.2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libusbmuxd.2.dylib; path = afcclient/mac_libs/libusbmuxd.2.dylib; sourceTree = "<group>"; };
+		8933D65B1A1E7FC4009182A9 /* libxml2.2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libxml2.2.dylib; path = afcclient/mac_libs/libxml2.2.dylib; sourceTree = "<group>"; };
+		8933D65C1A1E7FC4009182A9 /* libz.1.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.1.dylib; path = afcclient/mac_libs/libz.1.dylib; sourceTree = "<group>"; };
+		8933D6651A1E7FD1009182A9 /* libcrypto.1.0.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcrypto.1.0.0.dylib; path = afcclient/mac_libs/libcrypto.1.0.0.dylib; sourceTree = "<group>"; };
+		8933D6661A1E7FD1009182A9 /* libiconv.2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libiconv.2.dylib; path = afcclient/mac_libs/libiconv.2.dylib; sourceTree = "<group>"; };
+		8933D6671A1E7FD1009182A9 /* libimobiledevice.4.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libimobiledevice.4.dylib; path = afcclient/mac_libs/libimobiledevice.4.dylib; sourceTree = "<group>"; };
+		8933D6681A1E7FD1009182A9 /* libplist.2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libplist.2.dylib; path = afcclient/mac_libs/libplist.2.dylib; sourceTree = "<group>"; };
+		8933D6691A1E7FD1009182A9 /* libssl.1.0.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libssl.1.0.0.dylib; path = afcclient/mac_libs/libssl.1.0.0.dylib; sourceTree = "<group>"; };
+		8933D66A1A1E7FD1009182A9 /* libusbmuxd.2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libusbmuxd.2.dylib; path = afcclient/mac_libs/libusbmuxd.2.dylib; sourceTree = "<group>"; };
+		8933D66B1A1E7FD1009182A9 /* libxml2.2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libxml2.2.dylib; path = afcclient/mac_libs/libxml2.2.dylib; sourceTree = "<group>"; };
+		8933D66C1A1E7FD1009182A9 /* libz.1.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.1.dylib; path = afcclient/mac_libs/libz.1.dylib; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		8933D6421A1E7F1B009182A9 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8933D65D1A1E7FC4009182A9 /* libcrypto.1.0.0.dylib in Frameworks */,
+				8933D65E1A1E7FC4009182A9 /* libiconv.2.dylib in Frameworks */,
+				8933D65F1A1E7FC4009182A9 /* libimobiledevice.4.dylib in Frameworks */,
+				8933D6601A1E7FC4009182A9 /* libplist.2.dylib in Frameworks */,
+				8933D6611A1E7FC4009182A9 /* libssl.1.0.0.dylib in Frameworks */,
+				8933D6621A1E7FC4009182A9 /* libusbmuxd.2.dylib in Frameworks */,
+				8933D6631A1E7FC4009182A9 /* libxml2.2.dylib in Frameworks */,
+				8933D6641A1E7FC4009182A9 /* libz.1.dylib in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		8933D63C1A1E7F1B009182A9 = {
+			isa = PBXGroup;
+			children = (
+				8933D6751A1E7FE7009182A9 /* Libraries */,
+				8933D6471A1E7F1B009182A9 /* afcclient */,
+				8933D6461A1E7F1B009182A9 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		8933D6461A1E7F1B009182A9 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				8933D6451A1E7F1B009182A9 /* afcclient */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		8933D6471A1E7F1B009182A9 /* afcclient */ = {
+			isa = PBXGroup;
+			children = (
+				8933D64F1A1E7F6C009182A9 /* afcclient.c */,
+				8933D6501A1E7F6C009182A9 /* afcclient.h */,
+				8933D6511A1E7F6C009182A9 /* libidev.c */,
+				8933D6521A1E7F6C009182A9 /* libidev.h */,
+			);
+			path = afcclient;
+			sourceTree = "<group>";
+		};
+		8933D6751A1E7FE7009182A9 /* Libraries */ = {
+			isa = PBXGroup;
+			children = (
+				8933D6651A1E7FD1009182A9 /* libcrypto.1.0.0.dylib */,
+				8933D6661A1E7FD1009182A9 /* libiconv.2.dylib */,
+				8933D6671A1E7FD1009182A9 /* libimobiledevice.4.dylib */,
+				8933D6681A1E7FD1009182A9 /* libplist.2.dylib */,
+				8933D6691A1E7FD1009182A9 /* libssl.1.0.0.dylib */,
+				8933D66A1A1E7FD1009182A9 /* libusbmuxd.2.dylib */,
+				8933D66B1A1E7FD1009182A9 /* libxml2.2.dylib */,
+				8933D66C1A1E7FD1009182A9 /* libz.1.dylib */,
+				8933D6551A1E7FC4009182A9 /* libcrypto.1.0.0.dylib */,
+				8933D6561A1E7FC4009182A9 /* libiconv.2.dylib */,
+				8933D6571A1E7FC4009182A9 /* libimobiledevice.4.dylib */,
+				8933D6581A1E7FC4009182A9 /* libplist.2.dylib */,
+				8933D6591A1E7FC4009182A9 /* libssl.1.0.0.dylib */,
+				8933D65A1A1E7FC4009182A9 /* libusbmuxd.2.dylib */,
+				8933D65B1A1E7FC4009182A9 /* libxml2.2.dylib */,
+				8933D65C1A1E7FC4009182A9 /* libz.1.dylib */,
+			);
+			name = Libraries;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		8933D6441A1E7F1B009182A9 /* afcclient */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 8933D64C1A1E7F1C009182A9 /* Build configuration list for PBXNativeTarget "afcclient" */;
+			buildPhases = (
+				8933D6411A1E7F1B009182A9 /* Sources */,
+				8933D6421A1E7F1B009182A9 /* Frameworks */,
+				8933D6431A1E7F1B009182A9 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = afcclient;
+			productName = afcclient;
+			productReference = 8933D6451A1E7F1B009182A9 /* afcclient */;
+			productType = "com.apple.product-type.tool";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		8933D63D1A1E7F1B009182A9 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0600;
+				ORGANIZATIONNAME = "Kevin Bradley";
+				TargetAttributes = {
+					8933D6441A1E7F1B009182A9 = {
+						CreatedOnToolsVersion = 6.0.1;
+					};
+				};
+			};
+			buildConfigurationList = 8933D6401A1E7F1B009182A9 /* Build configuration list for PBXProject "afcclient" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 8933D63C1A1E7F1B009182A9;
+			productRefGroup = 8933D6461A1E7F1B009182A9 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				8933D6441A1E7F1B009182A9 /* afcclient */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		8933D6411A1E7F1B009182A9 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8933D6531A1E7F6C009182A9 /* afcclient.c in Sources */,
+				8933D6541A1E7F6C009182A9 /* libidev.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		8933D64A1A1E7F1C009182A9 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		8933D64B1A1E7F1C009182A9 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		8933D64D1A1E7F1C009182A9 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/afcclient/mac_libs",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)\"/**";
+			};
+			name = Debug;
+		};
+		8933D64E1A1E7F1C009182A9 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/afcclient/mac_libs",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)\"/**";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		8933D6401A1E7F1B009182A9 /* Build configuration list for PBXProject "afcclient" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8933D64A1A1E7F1C009182A9 /* Debug */,
+				8933D64B1A1E7F1C009182A9 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		8933D64C1A1E7F1C009182A9 /* Build configuration list for PBXNativeTarget "afcclient" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8933D64D1A1E7F1C009182A9 /* Debug */,
+				8933D64E1A1E7F1C009182A9 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 8933D63D1A1E7F1B009182A9 /* Project object */;
+}
