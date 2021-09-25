@@ -75,11 +75,12 @@ char * devices_to_xml(afc_idevice_info_t **devices, int itemCount) {
         plist_dict_set_item(currentDevicePlist, "ProductVersion", plist_new_string(currentDevice->productVersion));
         plist_dict_set_item(currentDevicePlist, "BuildVersion", plist_new_string(currentDevice->buildVersion));
         plist_dict_set_item(currentDevicePlist, "DeviceName", plist_new_string(currentDevice->deviceName));
+        plist_dict_set_item(currentDevicePlist, "DeviceClass", plist_new_string(currentDevice->deviceClass));
         plist_dict_set_item(currentDevicePlist, "HardwareModel", plist_new_string(currentDevice->hardwareModel));
         plist_dict_set_item(currentDevicePlist, "HardwarePlatform", plist_new_string(currentDevice->hardwarePlatform));
         plist_dict_set_item(currentDevicePlist, "UniqueDeviceID", plist_new_string(currentDevice->uniqueDeviceID));
         plist_dict_set_item(currentDevicePlist, "UniqueChipID", plist_new_uint(currentDevice->uniqueChipID));
-        plist_dict_set_item(currentDevicePlist, "PasswordProteced", plist_new_bool(currentDevice->passwordProtected));
+        plist_dict_set_item(currentDevicePlist, "PasswordProtected", plist_new_bool(currentDevice->passwordProtected));
         //if (currentDevice->URL != NULL)
         //	plist_dict_insert_item(currentDevicePlist, "URL", plist_new_string(currentDevice->URL));
         
@@ -154,6 +155,7 @@ afc_idevice_info_t * device_get_info(char *uuids) {
             char *hm = NULL;
             char *hp = NULL;
             char *ud = NULL;
+            char *dc = NULL;
             uint64_t uc;
             
             uint8_t pwProtected = false;
@@ -174,7 +176,7 @@ afc_idevice_info_t * device_get_info(char *uuids) {
             plist_get_string_val(plist_dict_get_item(node, "ProductVersion"), &pv);
             plist_get_string_val(plist_dict_get_item(node, "DeviceName"), &dn);
             plist_get_string_val(plist_dict_get_item(node, "HardwareModel"), &hm);
-            
+            plist_get_string_val(plist_dict_get_item(node, "DeviceClass"), &dc);
             plist_t hp_node = plist_dict_get_item(node, "HardwarePlatform");
             
             if (hp_node != NULL)
@@ -197,6 +199,7 @@ afc_idevice_info_t * device_get_info(char *uuids) {
             device_info->uniqueDeviceID = ud;
             device_info->uniqueChipID = uc;
             device_info->passwordProtected = pwProtected;
+            device_info->deviceClass = dc;
  
             plist_free(pt_node);
             plist_free(hp_node);

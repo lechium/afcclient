@@ -39,6 +39,7 @@ typedef struct afc_idevice_info_t {
     char *hardwareModel;
     char *hardwarePlatform;
     char *uniqueDeviceID;
+    char *deviceClass;
     //char *URL;
     uint64_t uniqueChipID;
     uint8_t passwordProtected; // 1 = yes, 0 = no (YES I ALWAYS FORGET!)
