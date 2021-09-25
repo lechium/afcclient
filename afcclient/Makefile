@@ -1,11 +1,11 @@
 CC=gcc
 CFLAGS=-Iinclude -Ilibimobiledevice -Iplist
-LDFLAGS=-limobiledevice.4 -lplist.2 -Iinclude -Ilibimobiledevice -Iplist -L.
+LDFLAGS=-limobiledevice-1.0 -lplist-2.0 -Iinclude -Ilibimobiledevice -Iplist -L. -Lstatic -I/usr/local/include -lusbmuxd-2.0 -limobiledevice-glue-1.0 -lssl -lcrypto
 
 OS := $(shell uname)
 ifeq ($(OS),Darwin)
   # Nothing special needed for MacOS
-LDFLAGS+= -Lmac_libs
+#LDFLAGS+= -Lmac_libs
 else ifeq ($(OS),Linux)
   CFLAGS+=-fblocks
   LDFLAGS+=-lBlocksRuntime

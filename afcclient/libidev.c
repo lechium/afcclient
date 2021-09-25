@@ -44,7 +44,7 @@
 #endif
 #define BUFFER_SIZE 0x1000
 
-bool idev_verbose=true;
+bool idev_verbose=false;
 
 #include "libidev.h"
 
@@ -54,11 +54,11 @@ bool idev_verbose=true;
 
 /**
  
- takes pointer array of idevice_info_t structs and converts them into a plist array of dictionary plists
+ takes pointer array of afc_idevice_info_t structs and converts them into a plist array of dictionary plists
  
  */
 
-char * devices_to_xml(idevice_info_t **devices, int itemCount) {
+char * devices_to_xml(afc_idevice_info_t **devices, int itemCount) {
     
     
     char *xmlData = NULL;
@@ -68,7 +68,7 @@ char * devices_to_xml(idevice_info_t **devices, int itemCount) {
     
     for (i = 0; i < itemCount; i++)
     {
-        idevice_info_t *currentDevice = devices[i];
+        afc_idevice_info_t *currentDevice = devices[i];
         plist_t currentDevicePlist = plist_new_dict();
         
         plist_dict_set_item(currentDevicePlist, "ProductType", plist_new_string(currentDevice->productType));
@@ -96,11 +96,11 @@ char * devices_to_xml(idevice_info_t **devices, int itemCount) {
 
 /**
  
- creates an idevice_info_t struct for a particular device based on its uuid
+ creates an afc_idevice_info_t struct for a particular device based on its uuid
  
  */
 
-idevice_info_t * device_get_info(char *uuids) {
+afc_idevice_info_t * device_get_info(char *uuids) {
     
     lockdownd_client_t client = NULL;
     idevice_t phone = NULL;
@@ -111,7 +111,7 @@ idevice_info_t * device_get_info(char *uuids) {
     plist_t node = NULL;
     
     if (uuids != 0) {
-        ret = idevice_new(&phone, uuids);
+        ret = idevice_new_with_options(&phone, uuids, IDEVICE_LOOKUP_USBMUX);
         if (ret != IDEVICE_E_SUCCESS) {
             printf("No device found with uuid %s, is it plugged in?\n", uuids);
             return NULL;
@@ -132,14 +132,15 @@ idevice_info_t * device_get_info(char *uuids) {
         idevice_free(phone);
         return NULL;
     }
-    
-    idevice_info_t *device_info = (idevice_info_t*)malloc(sizeof(idevice_info_t));
+    idevice_set_debug_level(5);
+    afc_idevice_info_t *device_info = (afc_idevice_info_t*)malloc(sizeof(afc_idevice_info_t));
     /* run query and output information */
     if(lockdownd_get_value(client, domain, key, &node) == LOCKDOWN_E_SUCCESS) {
         if (node) {
             
             char *xmlData = NULL;
             uint32_t length = 0;
+            printf("node %p\n", node);
             plist_to_xml(node, &xmlData, &length);
             
           //  printf("plist: %s\n", xmlData);
@@ -222,15 +223,15 @@ idevice_info_t * device_get_info(char *uuids) {
 
 /**
  
- return idevice_info_t struct of the first device of a particular type
+ return afc_idevice_info_t struct of the first device of a particular type
  ie: iPod5,1 or iPhone6,1
  
  */
 
-idevice_info_t * first_device_of_type(char *deviceType)
+afc_idevice_info_t * first_device_of_type(char *deviceType)
 {
     char **dev_list = NULL;
-    idevice_info_t *compatDevice = NULL;
+    afc_idevice_info_t *compatDevice = NULL;
     int i;
     if (idevice_get_device_list(&dev_list, &i) < 0) {
         
@@ -239,7 +240,7 @@ idevice_info_t * first_device_of_type(char *deviceType)
     }
     for (i = 0; dev_list[i] != NULL; i++) {
         
-        idevice_info_t *currentDevice = device_get_info(dev_list[i]);
+        afc_idevice_info_t *currentDevice = device_get_info(dev_list[i]);
         char *productType = currentDevice->productType;
         if (strcmp(productType, deviceType) == 0)
         {
@@ -265,7 +266,7 @@ char * get_deviceid_from_type(char *deviceType)
     }
     for (i = 0; dev_list[i] != NULL; i++) {
         
-        idevice_info_t *currentDevice = device_get_info(dev_list[i]);
+        afc_idevice_info_t *currentDevice = device_get_info(dev_list[i]);
         char *productType = currentDevice->productType;
         if (strcmp(productType, deviceType) == 0)
         {
@@ -280,11 +281,11 @@ char * get_deviceid_from_type(char *deviceType)
 
 /**
  
- get idevice_info_t pointer array of all the attached iOS devices
+ get afc_idevice_info_t pointer array of all the attached iOS devices
  
  */
 
-idevice_info_t ** get_attached_devices(int *deviceCount) {
+afc_idevice_info_t ** get_attached_devices(int *deviceCount) {
     
     char **dev_list = NULL;
     
@@ -293,9 +294,9 @@ idevice_info_t ** get_attached_devices(int *deviceCount) {
         fprintf(stderr, "ERROR: Unable to retrieve device list!\n");
         return NULL;
     }
-    idevice_info_t** list = (idevice_info_t**)malloc((i+1)*sizeof(idevice_info_t*));
+    afc_idevice_info_t** list = (afc_idevice_info_t**)malloc((i+1)*sizeof(afc_idevice_info_t*));
     for (i = 0; dev_list[i] != NULL; i++) {
-        //printf("%s\n", dev_list[i]);
+        printf("%s\n", dev_list[i]);
         list[i] = device_get_info(dev_list[i]);
     }
     idevice_device_list_free(dev_list);
@@ -312,7 +313,7 @@ idevice_info_t ** get_attached_devices(int *deviceCount) {
 char * get_attached_devices_xml(int *deviceCount) {
     
     int counts = 0;
-    idevice_info_t **devices = get_attached_devices(&counts);
+    afc_idevice_info_t **devices = get_attached_devices(&counts);
     
     if (devices == NULL)
     {
@@ -337,7 +338,7 @@ char * get_attached_devices_xml(int *deviceCount) {
 int print_device_xml()
 {
     int counts = 0;
-    idevice_info_t **devices = get_attached_devices(&counts);
+    afc_idevice_info_t **devices = get_attached_devices(&counts);
     char *xmlData = devices_to_xml(devices, counts);
     fprintf(stderr, "print_device_xml: %s\n", xmlData);
     free(xmlData);
@@ -351,11 +352,11 @@ int print_device_info()
     
     int i = 0;
     int counts = 0;
-    idevice_info_t **devices = get_attached_devices(&counts);
+    afc_idevice_info_t **devices = get_attached_devices(&counts);
     
     for (i = 0; i < counts; i++)
     {
-        idevice_info_t *deviceInfo = devices[i];
+        afc_idevice_info_t *deviceInfo = devices[i];
         printf("device %i of %i uuid: %s\n\n", i+1, counts, deviceInfo->uniqueDeviceID);
         printf("%s hardware model: %s hardware platform: %s\n", deviceInfo->deviceName, deviceInfo->hardwareModel, deviceInfo->hardwarePlatform);
         printf("%s running %s (%s)\n\n", deviceInfo->productType, deviceInfo->productVersion, deviceInfo->buildVersion);
@@ -381,9 +382,8 @@ const char *idev_idevice_strerror(idevice_error_t errnum)
             return "NO_DEVICE";
         case IDEVICE_E_NOT_ENOUGH_DATA:
             return "NOT_ENOUGH_DATA";
-        case IDEVICE_E_BAD_HEADER:
-            return "BAD_HEADER";
         case IDEVICE_E_SSL_ERROR:
+            return "BAD_SSL";
         default:
             return "UNKNOWN_EROR";
     }
@@ -406,20 +406,16 @@ const char *idev_lockdownd_strerror(lockdownd_error_t errnum)
             return "SSL_ERROR";
         case LOCKDOWN_E_DICT_ERROR:
             return "DICT_ERROR";
-        case LOCKDOWN_E_START_SERVICE_FAILED:
-            return "START_SERVICE_FAILED";
-        case LOCKDOWN_E_NOT_ENOUGH_DATA:
-            return "NOT_ENOUGH_DATA";
-        case LOCKDOWN_E_SET_VALUE_PROHIBITED:
+        case LOCKDOWN_E_RECEIVE_TIMEOUT:
+            return "LOCKDOWN_E_RECEIVE_TIMEOUT";
+        case LOCKDOWN_E_SET_PROHIBITED:
             return "SET_VALUE_PROHIBITED";
-        case LOCKDOWN_E_GET_VALUE_PROHIBITED:
+        case LOCKDOWN_E_GET_PROHIBITED:
             return "GET_VALUE_PROHIBITED";
-        case LOCKDOWN_E_REMOVE_VALUE_PROHIBITED:
+        case LOCKDOWN_E_REMOVE_PROHIBITED:
             return "REMOVE_VALUE_PROHIBITED";
         case LOCKDOWN_E_MUX_ERROR:
             return "MUX_ERROR";
-        case LOCKDOWN_E_ACTIVATION_FAILED:
-            return "ACTIVATION_FAILED";
         case LOCKDOWN_E_PASSWORD_PROTECTED:
             return "PASSWORD_PROTECTED";
         case LOCKDOWN_E_NO_RUNNING_SESSION:
@@ -954,13 +950,11 @@ afc_client_t idev_afc_app_client(char *clientname, char *udid, char *appid, int 
             lockdownd_error_t lret = lockdownd_start_service(client, HOUSE_ARREST_SERVICE_NAME, &ldsvc);
             
             if (lret == LOCKDOWN_E_SUCCESS && ldsvc) {
-                
                 house_arrest_client_t ha_client=NULL;
                 house_arrest_error_t ha_err = house_arrest_client_new(idev, ldsvc, &ha_client);
                 
                 if (ha_err == HOUSE_ARREST_E_SUCCESS && ha_client) {
-                    
-                    ha_err = house_arrest_send_command(ha_client, "VendContainer", appid);
+                    ha_err = house_arrest_send_command(ha_client, "VendDocuments", appid);
                     
                     if (ha_err == HOUSE_ARREST_E_SUCCESS) {
                         plist_t dict = NULL;

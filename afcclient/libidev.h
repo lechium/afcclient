@@ -31,7 +31,7 @@ extern "C" {
 #define HOUSE_ARREST_SERVICE_NAME "com.apple.mobile.house_arrest"
 
 
-typedef struct idevice_info_t {
+typedef struct afc_idevice_info_t {
     char *productType;
     char *productVersion;
     char *buildVersion;
@@ -43,15 +43,15 @@ typedef struct idevice_info_t {
     uint64_t uniqueChipID;
     uint8_t passwordProtected; // 1 = yes, 0 = no (YES I ALWAYS FORGET!)
     
-} idevice_info_t;
+} afc_idevice_info_t;
 
 LIBGMMD_EXPORT char * get_deviceid_from_type(char *deviceType);
-LIBGMMD_EXPORT char * devices_to_xml(idevice_info_t **devices, int itemCount);
-LIBGMMD_EXPORT idevice_info_t ** get_attached_devices(int *deviceCount);
+LIBGMMD_EXPORT char * devices_to_xml(afc_idevice_info_t **devices, int itemCount);
+LIBGMMD_EXPORT afc_idevice_info_t ** get_attached_devices(int *deviceCount);
 LIBGMMD_EXPORT int print_device_xml();
 LIBGMMD_EXPORT int print_device_info();
 LIBGMMD_EXPORT char * get_attached_devices_xml();
-LIBGMMD_EXPORT idevice_info_t * first_device_of_type(char *deviceType);
+LIBGMMD_EXPORT afc_idevice_info_t * first_device_of_type(char *deviceType);
     
 extern bool idev_verbose;
 
