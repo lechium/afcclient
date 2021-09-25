@@ -1019,7 +1019,7 @@ int list_devices(FILE *outf)
     }
     
     char *xmlData = devices_to_xml(devices, counts);
-    fprintf(outf, "print_device_xml: %s\n", xmlData);
+    fprintf(outf, "%s\n", xmlData);
     free(devices);
     return 0;
 }

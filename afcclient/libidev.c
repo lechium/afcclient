@@ -140,7 +140,6 @@ afc_idevice_info_t * device_get_info(char *uuids) {
             
             char *xmlData = NULL;
             uint32_t length = 0;
-            printf("node %p\n", node);
             plist_to_xml(node, &xmlData, &length);
             
           //  printf("plist: %s\n", xmlData);
@@ -296,7 +295,6 @@ afc_idevice_info_t ** get_attached_devices(int *deviceCount) {
     }
     afc_idevice_info_t** list = (afc_idevice_info_t**)malloc((i+1)*sizeof(afc_idevice_info_t*));
     for (i = 0; dev_list[i] != NULL; i++) {
-        printf("%s\n", dev_list[i]);
         list[i] = device_get_info(dev_list[i]);
     }
     idevice_device_list_free(dev_list);
