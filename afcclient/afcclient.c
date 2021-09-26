@@ -1129,17 +1129,9 @@ int cmd_main(afc_client_t afc, int argc, char **argv)
         //kevins additions
         
     } else if (!strcmp(cmd, "export")) {
-        if (hasAppID == false)
-        {
-            ret = -1;
-            printf("export requires an appid to be set!\n");
-            
-        } else {
-            char *input = argv[1];
-            char *output = argv[2];
-            ret = export_shallow_folder(afc, input, output);
-        }
-        
+        char *input = argv[1];
+        char *output = argv[2];
+        ret = export_shallow_folder(afc, input, output);
     }  else if (!strcmp(cmd, "clone")) {
         if (hasAppID == false)
         {
