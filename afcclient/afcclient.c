@@ -47,6 +47,7 @@
 char *progname;
 bool hasAppID;
 bool clean;
+bool recursiveList;
 
 void usage(FILE *outf);
 
@@ -79,7 +80,7 @@ void epochToTime(long epoch, char* s) {
     struct tm * dt;
     dt = localtime(&rawtime);
     char slocal[100];
-    strftime(slocal,sizeof(slocal),"%b %d %R", dt);
+    strftime(slocal,sizeof(slocal),"%b %d %G %R", dt);
     strncpy(s, slocal, 99);
     s[99] = '\0';
 }
@@ -264,8 +265,8 @@ int dump_afc_file_info_old(afc_client_t afc, const char *path)
  */
 int dump_afc_file_info(afc_client_t afc, const char *path) {
     //return dump_afc_file_info_old(afc, path);
-    int i, ret=EXIT_FAILURE;
-    if (strcmp(path, "..") == 0){
+    int i, ret=EXIT_FAILURE;//|| strstr(path, "/..") == 0 || strstr(path, "/.") == 0
+    if (strcmp(path, "..") == 0 || strcmp(path, "." ) == 0 || strstr(path, "/..") || strstr(path, "/.")){
         return ret;
     }
     plist_t *node = afc_file_info_for_path(afc, path);
@@ -278,12 +279,14 @@ int dump_afc_file_info(afc_client_t afc, const char *path) {
         char *time = NULL;
         char *lt = NULL;
         bool isLink = false;
+        bool isDirectory = false;
         plist_get_string_val(plist_dict_get_item(node, "st_ifmt"), &fmt);
         if (fmt){
             if (strcmp(fmt, "S_IFREG") == 0){
                 type = 'f';
             } else if (strcmp(fmt,"S_IFDIR") == 0) {
                 type = 'd';
+                isDirectory = true;
             } else if (strcmp(fmt,"S_IFLNK") == 0) {
                 isLink = true;
                 type = 'l';
@@ -304,6 +307,9 @@ int dump_afc_file_info(afc_client_t afc, const char *path) {
             snprintf(displayString, PATH_MAX-1, "%c %5ld\t%10ld\t%s\t%s", type, longlink, longsize, time, path);
         }
         printf("%s\n", displayString);
+        if (isDirectory && recursiveList){
+            dump_afc_list_path(afc, path);
+        }
         ret=EXIT_SUCCESS;
     } else {
         //fprintf(stderr, "Error: info error for path: %s - %s\n", path, idev_afc_strerror(err));
@@ -1163,7 +1169,7 @@ int cmd_main(afc_client_t afc, int argc, char **argv)
     return ret;
 }
 
-#define OPTION_FLAGS "rs:a:u:vhlc"
+#define OPTION_FLAGS "rs:a:u:vhlcR"
 void usage(FILE *outf)
 {
     fprintf(outf,
@@ -1176,6 +1182,7 @@ void usage(FILE *outf)
             "    -v, --verbose              Enable verbose debug messages\n"
             "    -h, --help                 Display this help message\n"
             "    -l, --list                 List devices\n"
+            "    -R, --recursive            List the specified folder recursively\n"
             "    -c, --clean                Cleans out folder after exporting/cloning\n\n"
             
             "  Where \"command\" and \"cmdargs...\" are as follows:\n\n"
@@ -1208,13 +1215,14 @@ static struct option longopts[] = {
     { "help",       no_argument,            NULL,   'h' },
     { "list",       no_argument,            NULL,   'l' },
     { "clean",      no_argument,            NULL,   'c' },
+    { "recursive",  no_argument,            NULL,   'R' },
     { NULL,         0,                      NULL,   0 }
 };
 
 int main(int argc, char **argv)
 {
     progname = basename(argv[0]);
-    
+    recursiveList = false;
     char *appid=NULL, *udid=NULL, *svcname=NULL;;
     hasAppID = false;
     clean = false;
@@ -1261,6 +1269,9 @@ int main(int argc, char **argv)
                 clean = true;
                 break;
                 
+            case 'R':
+                recursiveList = true;
+                break;
             default:
                 usage(stderr);
                 return EXIT_FAILURE;

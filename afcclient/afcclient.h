@@ -42,7 +42,8 @@ extern "C" {
 #else
 #	define LIBGMMD_EXPORT EXT_C __attribute__((visibility("default")))
 #endif
-    
+
+int dump_afc_list_path(afc_client_t afc, const char *path);
 LIBGMMD_EXPORT int list_devices(FILE *outf);
     
 LIBGMMD_EXPORT int rm_file(afc_client_t afc, char *filePath);
