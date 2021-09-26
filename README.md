@@ -66,6 +66,7 @@ l     1            11    Nov 14 17:20    var -> private/var
         -v, --verbose              Enable verbose debug messages
         -h, --help                 Display this help message
         -l, --list                 List devices
+        -R, --recursive            List the specified folder recursively
         -c, --clean                Cleans out folder after exporting/cloning
 
       New commands:

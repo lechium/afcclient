@@ -265,7 +265,7 @@ int dump_afc_file_info_old(afc_client_t afc, const char *path)
  */
 int dump_afc_file_info(afc_client_t afc, const char *path) {
     //return dump_afc_file_info_old(afc, path);
-    int i, ret=EXIT_FAILURE;//|| strstr(path, "/..") == 0 || strstr(path, "/.") == 0
+    int ret=EXIT_FAILURE;
     if (strcmp(path, "..") == 0 || strcmp(path, "." ) == 0 || strstr(path, "/..") || strstr(path, "/.")){
         return ret;
     }
