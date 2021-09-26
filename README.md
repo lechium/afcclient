@@ -11,6 +11,41 @@ A simple CLI interface to AFC via libimobiledevice.
 
 - if building for windows you will need mingw (http://mingw.org/wiki/Getting_Started)
 
+## Updated listing output
+
+The output is no longer fugly!
+
+```
+$ ./afcclient -r ls
+d    27           864    Sep 24 13:00    .
+d     2            64    Nov 14 17:09    .HFS+ Private Directory Data
+f     1             0    Mar 14 05:25    .Trashes
+d     2            64    Aug 29 00:14    .ba
+f     1             0    Nov 03 15:03    .bootstrapped
+f     1             0    Oct 02 19:38    .file
+d     5           160    Jun 12 07:16    .fseventsd
+d     2            64    Sep 29 20:28    .mb
+f     1             0    Nov 03 15:03    .mount_rw
+d   102          3264    Mar 08 18:31    Applications
+d     8           340    May 27 00:25    Developer
+d    26           832    Feb 28 12:24    Library
+d     3            96    Sep 29 13:19    System
+l     1            11    Sep 24 13:00    User -> /var/mobile
+d    61          1952    Feb 28 12:22    bin
+d     2            64    Oct 28 07:07    boot
+d     2            64    Oct 02 19:38    cores
+d     4          1707    Sep 24 13:00    dev
+l     1            11    Mar 14 05:24    etc -> private/etc
+d     2            64    Oct 28 07:07    lib
+d     2            64    Oct 28 07:07    mnt
+d     6           192    May 03 16:32    private
+d    47          1504    Feb 03 00:55    sbin
+l     1            15    Mar 14 05:25    tmp -> private/var/tmp
+d    12           384    Nov 03 15:03    usr
+l     1            11    Nov 14 17:20    var -> private/var
+```
+
+
 ## Building
 
     $ make
@@ -61,38 +96,6 @@ A simple CLI interface to AFC via libimobiledevice.
 ## Author
 
 Eric Monti - esmonti at gmail dot com
-
-more updates, the output is no longer fugly!
-
-```
-$ ./afcclient -r ls
-d    27           864    Sep 24 13:00    .
-d     2            64    Nov 14 17:09    .HFS+ Private Directory Data
-f     1             0    Mar 14 05:25    .Trashes
-d     2            64    Aug 29 00:14    .ba
-f     1             0    Nov 03 15:03    .bootstrapped
-f     1             0    Oct 02 19:38    .file
-d     5           160    Jun 12 07:16    .fseventsd
-d     2            64    Sep 29 20:28    .mb
-f     1             0    Nov 03 15:03    .mount_rw
-d   102          3264    Mar 08 18:31    Applications
-d     8           340    May 27 00:25    Developer
-d    26           832    Feb 28 12:24    Library
-d     3            96    Sep 29 13:19    System
-l     1            11    Sep 24 13:00    User -> /var/mobile
-d    61          1952    Feb 28 12:22    bin
-d     2            64    Oct 28 07:07    boot
-d     2            64    Oct 02 19:38    cores
-d     4          1707    Sep 24 13:00    dev
-l     1            11    Mar 14 05:24    etc -> private/etc
-d     2            64    Oct 28 07:07    lib
-d     2            64    Oct 28 07:07    mnt
-d     6           192    May 03 16:32    private
-d    47          1504    Feb 03 00:55    sbin
-l     1            15    Mar 14 05:25    tmp -> private/var/tmp
-d    12           384    Nov 03 15:03    usr
-l     1            11    Nov 14 17:20    var -> private/var
-```
 
 tweaked by Kevin Bradley to remove clang requirement, include built libs for mac and windows (32 bit only for windows)
 and added some improved recursive listing functionality with plist output.
