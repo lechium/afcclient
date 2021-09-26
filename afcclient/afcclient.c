@@ -29,6 +29,7 @@
 #include <sys/syslimits.h>
 #endif
 
+#include <time.h>
 #include <stdio.h>
 #include <errno.h>
 #include <libgen.h>
@@ -49,16 +50,13 @@ bool clean;
 
 void usage(FILE *outf);
 
-bool is_dir(char *path)
-{
+bool is_dir(char *path) {
     struct stat s;
     return (stat(path, &s) == 0 && s.st_mode & S_IFDIR);
 }
 
-int dump_afc_device_info(afc_client_t afc)
-{
+int dump_afc_device_info(afc_client_t afc) {
     int ret=EXIT_FAILURE;
-    
     char **infos=NULL;
     afc_error_t err=afc_get_device_info(afc, &infos);
     if (err == AFC_E_SUCCESS && infos) {
@@ -66,18 +64,24 @@ int dump_afc_device_info(afc_client_t afc)
         printf("AFC Device Info: -");
         for (i=0; infos[i]; i++)
         printf("%c%s", ((i%2)? ':' : ' '), infos[i]);
-        
         printf("\n");
         ret = EXIT_SUCCESS;
-        
     } else {
         fprintf(stderr, "Error: afc get device info failed: %s\n", idev_afc_strerror(err));
     }
-    
     if (infos)
         idevice_device_list_free(infos);
-    
     return ret;
+}
+
+void epochToTime(long epoch, char* s) {
+    const time_t rawtime = epoch/1000000000;
+    struct tm * dt;
+    dt = localtime(&rawtime);
+    char slocal[100];
+    strftime(slocal,sizeof(slocal),"%b %d %R", dt);
+    strncpy(s, slocal, 99);
+    s[99] = '\0';
 }
 
 /*
@@ -99,49 +103,31 @@ plist_t * afc_file_info_for_path(afc_client_t afc, const char *path) {
     int i, ret=EXIT_FAILURE;
     char **infolist=NULL;
     plist_t currentDevicePlist = plist_new_dict();
-    
     afc_error_t err = afc_get_file_info(afc, path, &infolist);
     
     if (err == AFC_E_SUCCESS && infolist) {
-        
         plist_dict_set_item(currentDevicePlist, "path", plist_new_string(path));
-        
         int arraySize = 0;
-        for(i=0; infolist[i]; i++)
-        {
+        for(i=0; infolist[i]; i++) {
             arraySize++;
         }
-        
-        for(i=0; infolist[i]; i++)
-        {
-            
-            if (i+1 < arraySize && (i % 2 == 0))
-            {
-                if (strcmp("st_birthtime", infolist[i])== 0 || strcmp("st_mtime", infolist[i]) == 0)
-                {
-                    //make the time values a little saner
-                    long timeValue = atol(infolist[i+1])/1000000000;
-                    char str[11];
-                    sprintf(str,"%ld",timeValue);
-                    
-                    //  printf("timeValue: %s\n", str);
-                    plist_dict_set_item(currentDevicePlist, infolist[i], plist_new_string(str));
+        for(i=0; infolist[i]; i++) {
+            if (i+1 < arraySize && (i % 2 == 0)) {
+                if (strcmp("st_birthtime", infolist[i])== 0 || strcmp("st_mtime", infolist[i]) == 0) {
+                    char s[100];
+                    epochToTime(atol(infolist[i+1]),s);
+                    plist_dict_set_item(currentDevicePlist, infolist[i], plist_new_string(s));
                 } else {
                     plist_dict_set_item(currentDevicePlist, infolist[i], plist_new_string(infolist[i+1]));
                 }
-                
-                
             }
         }
-        
         // printf("\t%s\n %i", path, i);
         ret=EXIT_SUCCESS;
         
     } else {
         fprintf(stderr, "Error: info error for path: %s - %s\n", path, idev_afc_strerror(err));
     }
-    
-    
     if (infolist)
         idevice_device_list_free(infolist);
     
@@ -155,10 +141,8 @@ plist_t * afc_file_info_for_path(afc_client_t afc, const char *path) {
  
  */
 
-plist_t * afc_list_path(afc_client_t afc, const char *path, int8_t recursive)
-{
+plist_t * afc_list_path(afc_client_t afc, const char *path, int8_t recursive) {
     int ret=EXIT_FAILURE;
-    
     char **list=NULL;
     plist_t fileList = plist_new_array();
     if (idev_verbose)
@@ -168,7 +152,6 @@ plist_t * afc_list_path(afc_client_t afc, const char *path, int8_t recursive)
     
     if (err == AFC_E_SUCCESS && list) {
         int i;
-        
         if (idev_verbose){
             printf("AFC Device Listing path=\"%s\":\n", path);
         }
@@ -184,9 +167,7 @@ plist_t * afc_list_path(afc_client_t afc, const char *path, int8_t recursive)
                 }
                 lpath = tpath;
             }
-            
-            if (strcmp(list[i], ".") != 0 && strcmp(list[i], "..") != 0  )
-            {
+            if (strcmp(list[i], ".") != 0 && strcmp(list[i], "..") != 0) {
                 plist_t *fileInfo = afc_file_info_for_path(afc, lpath);
                 
                 //if is a directory recurse into it
@@ -194,8 +175,7 @@ plist_t * afc_list_path(afc_client_t afc, const char *path, int8_t recursive)
                 char *fmt = NULL;
                 plist_get_string_val(fmt_node, &fmt);
                 
-                if ((strcmp(fmt, "S_IFDIR") == 0) && (recursive == true))
-                {
+                if ((strcmp(fmt, "S_IFDIR") == 0) && (recursive == true)){
                     plist_t infoCopy = plist_copy(fileInfo);
                     plist_array_append_item(fileList, infoCopy);
                     if (idev_verbose){
@@ -203,41 +183,30 @@ plist_t * afc_list_path(afc_client_t afc, const char *path, int8_t recursive)
                     }
                     plist_t *dirInfo = afc_list_path(afc, lpath, true);
                     //          printf("lpath: %s\n", lpath);
-                    
-                    
                     uint32_t arrayCount = plist_array_get_size(dirInfo);
-                    
                     int j;
-                    
-                    for (j = 0; j < arrayCount; j++)
-                    {
+                    for (j = 0; j < arrayCount; j++){
                         //  printf("j: %i\n", j);
                         plist_t arrayItem = NULL;
-                        
                         arrayItem = plist_array_get_item(dirInfo, j);
-                        
-                        if (arrayItem != NULL)
-                        {
+                        if (arrayItem != NULL) {
                             //need to make a copy of the item for some reason... things just disappear otherwise
                             plist_t itemCopy = plist_copy(arrayItem);
                             plist_array_append_item(fileList, itemCopy);
                         }
-                        
-                        
-                        
                     }
                     
-                    
-                } else if (strcmp(fmt, "S_IFREG") == 0){ //not a directory, just a file
+                } else if (strcmp(fmt, "S_IFREG") == 0) { //not a directory, just a file
                     if (idev_verbose){
                         printf("%s file, treat normally!!\n", lpath);
                     }
-                    
                     plist_array_append_item(fileList, fileInfo);
-                    
+                } else if (strcmp(fmt, "S_IFLNK") == 0) {
+                    if (idev_verbose){
+                        printf("%s symbolic link, treat normally!!\n", lpath);
+                    }
+                    plist_array_append_item(fileList, fileInfo);
                 }
-                
-                
             }
         }
         
@@ -258,9 +227,7 @@ plist_t * afc_list_path(afc_client_t afc, const char *path, int8_t recursive)
     return fileList;
 }
 
-
-
-int dump_afc_file_info(afc_client_t afc, const char *path)
+int dump_afc_file_info_old(afc_client_t afc, const char *path)
 {
     int i, ret=EXIT_FAILURE;
     
@@ -284,7 +251,65 @@ int dump_afc_file_info(afc_client_t afc, const char *path)
     return ret;
 }
 
-
+/*
+ 
+ much prettier now!
+ 
+ d    61          1952    Feb 28 12:22    bin
+ d     2            64    Oct 28 07:07    boot
+ d     2            64    Oct 02 19:38    cores
+ d     4          1707    Sep 24 13:00    dev
+ l     1            11    Mar 14 05:24    etc -> private/etc
+ 
+ */
+int dump_afc_file_info(afc_client_t afc, const char *path) {
+    //return dump_afc_file_info_old(afc, path);
+    int i, ret=EXIT_FAILURE;
+    if (strcmp(path, "..") == 0){
+        return ret;
+    }
+    plist_t *node = afc_file_info_for_path(afc, path);
+    if (node){
+        char displayString[PATH_MAX];
+        char type;
+        char *fmt = NULL;
+        char *link = NULL;
+        char *size = NULL;
+        char *time = NULL;
+        char *lt = NULL;
+        bool isLink = false;
+        plist_get_string_val(plist_dict_get_item(node, "st_ifmt"), &fmt);
+        if (fmt){
+            if (strcmp(fmt, "S_IFREG") == 0){
+                type = 'f';
+            } else if (strcmp(fmt,"S_IFDIR") == 0) {
+                type = 'd';
+            } else if (strcmp(fmt,"S_IFLNK") == 0) {
+                isLink = true;
+                type = 'l';
+            }
+        } else {
+            return ret;
+        }
+        plist_get_string_val(plist_dict_get_item(node, "st_nlink"), &link);
+        plist_get_string_val(plist_dict_get_item(node, "st_size"), &size);
+        long longsize = atol(size);
+        long longlink = atol(link);
+        plist_get_string_val(plist_dict_get_item(node, "st_mtime"), &time);
+        
+        if (isLink){
+            plist_get_string_val(plist_dict_get_item(node, "LinkTarget"), &lt);
+            snprintf(displayString, PATH_MAX-1, "%c %5ld\t%10ld\t%s\t%s -> %s", type, longlink, longsize, time, path, lt);
+        } else {
+            snprintf(displayString, PATH_MAX-1, "%c %5ld\t%10ld\t%s\t%s", type, longlink, longsize, time, path);
+        }
+        printf("%s\n", displayString);
+        ret=EXIT_SUCCESS;
+    } else {
+        //fprintf(stderr, "Error: info error for path: %s - %s\n", path, idev_afc_strerror(err));
+    }
+    return ret;
+}
 
 int dump_afc_list_path(afc_client_t afc, const char *path)
 {
@@ -823,9 +848,23 @@ int do_list(afc_client_t afc, int argc, char **argv)
     if (argc > 1) {
         for (i=1; i<argc ; i++) {
             ret |= dump_afc_list_path(afc, argv[i]);
+            /*
+            plist_t *dirInfo = afc_list_path(afc, argv[i], true);
+            char *xmlData = NULL;
+            uint32_t length = 0;
+            plist_to_xml(dirInfo, &xmlData, &length);
+            fprintf(stderr, "%s\n", xmlData);
+             */
         }
     } else {
         ret = dump_afc_list_path(afc, "");
+        /*
+        plist_t *dirInfo = afc_list_path(afc, "", true);
+        char *xmlData = NULL;
+        uint32_t length = 0;
+        plist_to_xml(dirInfo, &xmlData, &length);
+        fprintf(stderr, "%s\n", xmlData);
+         */
     }
     
     return ret;
