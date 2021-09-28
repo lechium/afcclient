@@ -7,24 +7,14 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		326C39042702D6120045A3DE /* libusbmuxd-2.0.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 326C38FC2702D6010045A3DE /* libusbmuxd-2.0.a */; };
+		326C39052702D6120045A3DE /* libssl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 326C38FD2702D6010045A3DE /* libssl.a */; };
+		326C39082702D6120045A3DE /* libimobiledevice-1.0.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 326C39012702D6010045A3DE /* libimobiledevice-1.0.a */; };
+		326C39092702D6120045A3DE /* libcrypto.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 326C38FF2702D6010045A3DE /* libcrypto.a */; };
+		326C390A2702D6120045A3DE /* libimobiledevice-glue-1.0.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 326C39022702D6010045A3DE /* libimobiledevice-glue-1.0.a */; };
+		326C390B2702D6120045A3DE /* libplist-2.0.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 326C39002702D6010045A3DE /* libplist-2.0.a */; };
 		8933D6531A1E7F6C009182A9 /* afcclient.c in Sources */ = {isa = PBXBuildFile; fileRef = 8933D64F1A1E7F6C009182A9 /* afcclient.c */; };
 		8933D6541A1E7F6C009182A9 /* libidev.c in Sources */ = {isa = PBXBuildFile; fileRef = 8933D6511A1E7F6C009182A9 /* libidev.c */; };
-		8933D65D1A1E7FC4009182A9 /* libcrypto.1.0.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 8933D6551A1E7FC4009182A9 /* libcrypto.1.0.0.dylib */; };
-		8933D65E1A1E7FC4009182A9 /* libiconv.2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 8933D6561A1E7FC4009182A9 /* libiconv.2.dylib */; };
-		8933D65F1A1E7FC4009182A9 /* libimobiledevice.4.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 8933D6571A1E7FC4009182A9 /* libimobiledevice.4.dylib */; };
-		8933D6601A1E7FC4009182A9 /* libplist.2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 8933D6581A1E7FC4009182A9 /* libplist.2.dylib */; };
-		8933D6611A1E7FC4009182A9 /* libssl.1.0.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 8933D6591A1E7FC4009182A9 /* libssl.1.0.0.dylib */; };
-		8933D6621A1E7FC4009182A9 /* libusbmuxd.2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 8933D65A1A1E7FC4009182A9 /* libusbmuxd.2.dylib */; };
-		8933D6631A1E7FC4009182A9 /* libxml2.2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 8933D65B1A1E7FC4009182A9 /* libxml2.2.dylib */; };
-		8933D6641A1E7FC4009182A9 /* libz.1.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 8933D65C1A1E7FC4009182A9 /* libz.1.dylib */; };
-		8933D66D1A1E7FD1009182A9 /* libcrypto.1.0.0.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8933D6651A1E7FD1009182A9 /* libcrypto.1.0.0.dylib */; };
-		8933D66E1A1E7FD1009182A9 /* libiconv.2.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8933D6661A1E7FD1009182A9 /* libiconv.2.dylib */; };
-		8933D66F1A1E7FD1009182A9 /* libimobiledevice.4.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8933D6671A1E7FD1009182A9 /* libimobiledevice.4.dylib */; };
-		8933D6701A1E7FD1009182A9 /* libplist.2.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8933D6681A1E7FD1009182A9 /* libplist.2.dylib */; };
-		8933D6711A1E7FD1009182A9 /* libssl.1.0.0.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8933D6691A1E7FD1009182A9 /* libssl.1.0.0.dylib */; };
-		8933D6721A1E7FD1009182A9 /* libusbmuxd.2.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8933D66A1A1E7FD1009182A9 /* libusbmuxd.2.dylib */; };
-		8933D6731A1E7FD1009182A9 /* libxml2.2.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8933D66B1A1E7FD1009182A9 /* libxml2.2.dylib */; };
-		8933D6741A1E7FD1009182A9 /* libz.1.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8933D66C1A1E7FD1009182A9 /* libz.1.dylib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -34,41 +24,23 @@
 			dstPath = "";
 			dstSubfolderSpec = 6;
 			files = (
-				8933D66D1A1E7FD1009182A9 /* libcrypto.1.0.0.dylib in CopyFiles */,
-				8933D66E1A1E7FD1009182A9 /* libiconv.2.dylib in CopyFiles */,
-				8933D66F1A1E7FD1009182A9 /* libimobiledevice.4.dylib in CopyFiles */,
-				8933D6701A1E7FD1009182A9 /* libplist.2.dylib in CopyFiles */,
-				8933D6711A1E7FD1009182A9 /* libssl.1.0.0.dylib in CopyFiles */,
-				8933D6721A1E7FD1009182A9 /* libusbmuxd.2.dylib in CopyFiles */,
-				8933D6731A1E7FD1009182A9 /* libxml2.2.dylib in CopyFiles */,
-				8933D6741A1E7FD1009182A9 /* libz.1.dylib in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		326C38FC2702D6010045A3DE /* libusbmuxd-2.0.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libusbmuxd-2.0.a"; path = "afcclient/static/libusbmuxd-2.0.a"; sourceTree = "<group>"; };
+		326C38FD2702D6010045A3DE /* libssl.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libssl.a; path = afcclient/static/libssl.a; sourceTree = "<group>"; };
+		326C38FF2702D6010045A3DE /* libcrypto.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libcrypto.a; path = afcclient/static/libcrypto.a; sourceTree = "<group>"; };
+		326C39002702D6010045A3DE /* libplist-2.0.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libplist-2.0.a"; path = "afcclient/static/libplist-2.0.a"; sourceTree = "<group>"; };
+		326C39012702D6010045A3DE /* libimobiledevice-1.0.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libimobiledevice-1.0.a"; path = "afcclient/static/libimobiledevice-1.0.a"; sourceTree = "<group>"; };
+		326C39022702D6010045A3DE /* libimobiledevice-glue-1.0.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libimobiledevice-glue-1.0.a"; path = "afcclient/static/libimobiledevice-glue-1.0.a"; sourceTree = "<group>"; };
 		8933D6451A1E7F1B009182A9 /* afcclient */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = afcclient; sourceTree = BUILT_PRODUCTS_DIR; };
 		8933D64F1A1E7F6C009182A9 /* afcclient.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = afcclient.c; sourceTree = "<group>"; };
 		8933D6501A1E7F6C009182A9 /* afcclient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = afcclient.h; sourceTree = "<group>"; };
 		8933D6511A1E7F6C009182A9 /* libidev.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = libidev.c; sourceTree = "<group>"; };
 		8933D6521A1E7F6C009182A9 /* libidev.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = libidev.h; sourceTree = "<group>"; };
-		8933D6551A1E7FC4009182A9 /* libcrypto.1.0.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcrypto.1.0.0.dylib; path = afcclient/mac_libs/libcrypto.1.0.0.dylib; sourceTree = "<group>"; };
-		8933D6561A1E7FC4009182A9 /* libiconv.2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libiconv.2.dylib; path = afcclient/mac_libs/libiconv.2.dylib; sourceTree = "<group>"; };
-		8933D6571A1E7FC4009182A9 /* libimobiledevice.4.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libimobiledevice.4.dylib; path = afcclient/mac_libs/libimobiledevice.4.dylib; sourceTree = "<group>"; };
-		8933D6581A1E7FC4009182A9 /* libplist.2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libplist.2.dylib; path = afcclient/mac_libs/libplist.2.dylib; sourceTree = "<group>"; };
-		8933D6591A1E7FC4009182A9 /* libssl.1.0.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libssl.1.0.0.dylib; path = afcclient/mac_libs/libssl.1.0.0.dylib; sourceTree = "<group>"; };
-		8933D65A1A1E7FC4009182A9 /* libusbmuxd.2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libusbmuxd.2.dylib; path = afcclient/mac_libs/libusbmuxd.2.dylib; sourceTree = "<group>"; };
-		8933D65B1A1E7FC4009182A9 /* libxml2.2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libxml2.2.dylib; path = afcclient/mac_libs/libxml2.2.dylib; sourceTree = "<group>"; };
-		8933D65C1A1E7FC4009182A9 /* libz.1.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.1.dylib; path = afcclient/mac_libs/libz.1.dylib; sourceTree = "<group>"; };
-		8933D6651A1E7FD1009182A9 /* libcrypto.1.0.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcrypto.1.0.0.dylib; path = afcclient/mac_libs/libcrypto.1.0.0.dylib; sourceTree = "<group>"; };
-		8933D6661A1E7FD1009182A9 /* libiconv.2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libiconv.2.dylib; path = afcclient/mac_libs/libiconv.2.dylib; sourceTree = "<group>"; };
-		8933D6671A1E7FD1009182A9 /* libimobiledevice.4.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libimobiledevice.4.dylib; path = afcclient/mac_libs/libimobiledevice.4.dylib; sourceTree = "<group>"; };
-		8933D6681A1E7FD1009182A9 /* libplist.2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libplist.2.dylib; path = afcclient/mac_libs/libplist.2.dylib; sourceTree = "<group>"; };
-		8933D6691A1E7FD1009182A9 /* libssl.1.0.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libssl.1.0.0.dylib; path = afcclient/mac_libs/libssl.1.0.0.dylib; sourceTree = "<group>"; };
-		8933D66A1A1E7FD1009182A9 /* libusbmuxd.2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libusbmuxd.2.dylib; path = afcclient/mac_libs/libusbmuxd.2.dylib; sourceTree = "<group>"; };
-		8933D66B1A1E7FD1009182A9 /* libxml2.2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libxml2.2.dylib; path = afcclient/mac_libs/libxml2.2.dylib; sourceTree = "<group>"; };
-		8933D66C1A1E7FD1009182A9 /* libz.1.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.1.dylib; path = afcclient/mac_libs/libz.1.dylib; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -76,26 +48,37 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				8933D65D1A1E7FC4009182A9 /* libcrypto.1.0.0.dylib in Frameworks */,
-				8933D65E1A1E7FC4009182A9 /* libiconv.2.dylib in Frameworks */,
-				8933D65F1A1E7FC4009182A9 /* libimobiledevice.4.dylib in Frameworks */,
-				8933D6601A1E7FC4009182A9 /* libplist.2.dylib in Frameworks */,
-				8933D6611A1E7FC4009182A9 /* libssl.1.0.0.dylib in Frameworks */,
-				8933D6621A1E7FC4009182A9 /* libusbmuxd.2.dylib in Frameworks */,
-				8933D6631A1E7FC4009182A9 /* libxml2.2.dylib in Frameworks */,
-				8933D6641A1E7FC4009182A9 /* libz.1.dylib in Frameworks */,
+				326C39052702D6120045A3DE /* libssl.a in Frameworks */,
+				326C39092702D6120045A3DE /* libcrypto.a in Frameworks */,
+				326C39042702D6120045A3DE /* libusbmuxd-2.0.a in Frameworks */,
+				326C390A2702D6120045A3DE /* libimobiledevice-glue-1.0.a in Frameworks */,
+				326C390B2702D6120045A3DE /* libplist-2.0.a in Frameworks */,
+				326C39082702D6120045A3DE /* libimobiledevice-1.0.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		326C38FB2702D6010045A3DE /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				326C38FF2702D6010045A3DE /* libcrypto.a */,
+				326C39012702D6010045A3DE /* libimobiledevice-1.0.a */,
+				326C39022702D6010045A3DE /* libimobiledevice-glue-1.0.a */,
+				326C39002702D6010045A3DE /* libplist-2.0.a */,
+				326C38FD2702D6010045A3DE /* libssl.a */,
+				326C38FC2702D6010045A3DE /* libusbmuxd-2.0.a */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		8933D63C1A1E7F1B009182A9 = {
 			isa = PBXGroup;
 			children = (
-				8933D6751A1E7FE7009182A9 /* Libraries */,
 				8933D6471A1E7F1B009182A9 /* afcclient */,
 				8933D6461A1E7F1B009182A9 /* Products */,
+				326C38FB2702D6010045A3DE /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -116,29 +99,6 @@
 				8933D6521A1E7F6C009182A9 /* libidev.h */,
 			);
 			path = afcclient;
-			sourceTree = "<group>";
-		};
-		8933D6751A1E7FE7009182A9 /* Libraries */ = {
-			isa = PBXGroup;
-			children = (
-				8933D6651A1E7FD1009182A9 /* libcrypto.1.0.0.dylib */,
-				8933D6661A1E7FD1009182A9 /* libiconv.2.dylib */,
-				8933D6671A1E7FD1009182A9 /* libimobiledevice.4.dylib */,
-				8933D6681A1E7FD1009182A9 /* libplist.2.dylib */,
-				8933D6691A1E7FD1009182A9 /* libssl.1.0.0.dylib */,
-				8933D66A1A1E7FD1009182A9 /* libusbmuxd.2.dylib */,
-				8933D66B1A1E7FD1009182A9 /* libxml2.2.dylib */,
-				8933D66C1A1E7FD1009182A9 /* libz.1.dylib */,
-				8933D6551A1E7FC4009182A9 /* libcrypto.1.0.0.dylib */,
-				8933D6561A1E7FC4009182A9 /* libiconv.2.dylib */,
-				8933D6571A1E7FC4009182A9 /* libimobiledevice.4.dylib */,
-				8933D6581A1E7FC4009182A9 /* libplist.2.dylib */,
-				8933D6591A1E7FC4009182A9 /* libssl.1.0.0.dylib */,
-				8933D65A1A1E7FC4009182A9 /* libusbmuxd.2.dylib */,
-				8933D65B1A1E7FC4009182A9 /* libxml2.2.dylib */,
-				8933D65C1A1E7FC4009182A9 /* libz.1.dylib */,
-			);
-			name = Libraries;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -180,6 +140,7 @@
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
+				English,
 				en,
 			);
 			mainGroup = 8933D63C1A1E7F1B009182A9;
@@ -282,10 +243,16 @@
 		8933D64D1A1E7F1C009182A9 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				HEADER_SEARCH_PATHS = (
+					$SRCROOT/afcclient/libimobiledevice,
+					$SRCROOT/afcclient/include,
+				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/afcclient/mac_libs",
+					"$(PROJECT_DIR)/afcclient/static",
 				);
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)\"/**";
 			};
@@ -294,10 +261,16 @@
 		8933D64E1A1E7F1C009182A9 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				HEADER_SEARCH_PATHS = (
+					$SRCROOT/afcclient/libimobiledevice,
+					$SRCROOT/afcclient/include,
+				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/afcclient/mac_libs",
+					"$(PROJECT_DIR)/afcclient/static",
 				);
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)\"/**";
 			};
@@ -322,6 +295,7 @@
 				8933D64E1A1E7F1C009182A9 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

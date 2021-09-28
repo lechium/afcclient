@@ -17,6 +17,8 @@
  * 1. the ability to make carbon copy clones of documents folder
  * 2. use libimobiledevice to list all attached iOS devices
  * 3. print plist formatted recursive documents list
+ * 4. Added recursive listing support
+ * 5. Made the standard listing output a lot nicer looking (attempted to make it look like ls -al)
  */
 
 #include "afcclient.h"
@@ -48,6 +50,7 @@ char *progname;
 bool hasAppID;
 bool clean;
 bool recursiveList;
+bool root;
 
 void usage(FILE *outf);
 
@@ -228,8 +231,7 @@ plist_t * afc_list_path(afc_client_t afc, const char *path, int8_t recursive) {
     return fileList;
 }
 
-int dump_afc_file_info_old(afc_client_t afc, const char *path)
-{
+int dump_afc_file_info_old(afc_client_t afc, const char *path) {
     int i, ret=EXIT_FAILURE;
     
     char **infolist=NULL;
@@ -272,7 +274,7 @@ int dump_afc_file_info(afc_client_t afc, const char *path) {
     plist_t *node = afc_file_info_for_path(afc, path);
     if (node){
         char displayString[PATH_MAX];
-        char type;
+        char type = '\0';
         char *fmt = NULL;
         char *link = NULL;
         char *size = NULL;
@@ -317,17 +319,13 @@ int dump_afc_file_info(afc_client_t afc, const char *path) {
     return ret;
 }
 
-int dump_afc_list_path(afc_client_t afc, const char *path)
-{
+int dump_afc_list_path(afc_client_t afc, const char *path) {
     int ret=EXIT_FAILURE;
-    
     char **list=NULL;
-    
     if (idev_verbose)
         fprintf(stderr, "[debug] reading afc directory contents at \"%s\"\n", path);
     
     afc_error_t err = afc_read_directory(afc, path, &list);
-    
     if (err == AFC_E_SUCCESS && list) {
         int i;
         if (idev_verbose){
@@ -366,12 +364,9 @@ int dump_afc_list_path(afc_client_t afc, const char *path)
 }
 
 
-int dump_afc_path(afc_client_t afc, const char *path, FILE *outf)
-{
+int dump_afc_path(afc_client_t afc, const char *path, FILE *outf) {
     int ret=EXIT_FAILURE;
-    
     uint64_t handle=0;
-    
     if (idev_verbose)
         fprintf(stderr, "[debug] creating afc file connection to %s\n", path);
     
@@ -394,7 +389,6 @@ int dump_afc_path(afc_client_t afc, const char *path, FILE *outf)
     } else {
         fprintf(stderr, "Error: afc open file %s failed: %s\n", path, idev_afc_strerror(err));
     }
-    
     return ret;
 }
 
@@ -461,8 +455,7 @@ int dump_afc_path(afc_client_t afc, const char *path, FILE *outf)
  
  */
 
-char * write_mode_for_file(char *filename)
-{
+char * write_mode_for_file(char *filename) {
     char* ret = "w";
 #if defined(_WIN32)
     char* ext;
@@ -475,7 +468,6 @@ char * write_mode_for_file(char *filename)
         ret = "wb";
     }
 #endif
-    
     return ret;
 }
 
@@ -520,8 +512,7 @@ char * write_mode_for_file(char *filename)
  
  */
 
-int clone_afc_path(afc_client_t afc, const char *src, const char *dst)
-{
+int clone_afc_path(afc_client_t afc, const char *src, const char *dst) {
     int ret=EXIT_FAILURE;
     
     if (idev_verbose)
@@ -556,8 +547,7 @@ int clone_afc_path(afc_client_t afc, const char *src, const char *dst)
     
 #endif
     
-    for (i = 0; i < fileCount; i++)
-    {
+    for (i = 0; i < fileCount; i++) {
         char *path = NULL;
         plist_t item = plist_array_get_item(fileList, i);
         plist_t path_node = plist_dict_get_item(item, "path");
@@ -566,16 +556,17 @@ int clone_afc_path(afc_client_t afc, const char *src, const char *dst)
         plist_get_string_val(fmt_node, &fmt);
         plist_get_string_val(path_node, &path);
         char newPath[PATH_MAX];
+        char sys[PATH_MAX];
         
-        
-        if (strcmp(fmt, "S_IFDIR") == 0)
-        {
+        if (strcmp(fmt, "S_IFDIR") == 0) {
             sprintf(newPath,"%s/%s/",dst, path);
-            
+            sprintf(sys, "/bin/mkdir -p %s", newPath); //using mkdir -p since theres no easy way to use mkdir() to create intermediate paths
 #if defined(_WIN32)
             _mkdir(newPath);
             
 #else
+            printf("%s\n", sys);
+            system(sys);
             mkdir(newPath, 0777); // notice that 777 is different than 0777
 #endif
             printf("mkdir at new path: %s\n", newPath);
@@ -621,14 +612,12 @@ int clone_afc_path(afc_client_t afc, const char *src, const char *dst)
                  TODO: make it so if we are done with a folder and it is empty, we clear it out!
                  
                  */
-                if (ret == EXIT_SUCCESS)
-                {
+                if (ret == EXIT_SUCCESS) {
                     if (clean == true)
                     {
                         fprintf(stderr, "File cloned successfully, clearing original: %s\n", path);
                         rm_file(afc, (char*)path);
                     }
-                    
                 }
                 
             } else {
@@ -643,8 +632,7 @@ int clone_afc_path(afc_client_t afc, const char *src, const char *dst)
     return ret;
 }
 
-int export_shallow_folder(afc_client_t afc, const char *src, const char *dst)
-{
+int export_shallow_folder(afc_client_t afc, const char *src, const char *dst) {
     int ret=EXIT_FAILURE;
     
     if (idev_verbose)
@@ -659,8 +647,7 @@ int export_shallow_folder(afc_client_t afc, const char *src, const char *dst)
     
     int i;
     
-    for (i = 0; i < fileCount; i++)
-    {
+    for (i = 0; i < fileCount; i++) {
         char *path = NULL;
         plist_t item = plist_array_get_item(fileList, i);
         plist_t path_node = plist_dict_get_item(item, "path");
@@ -670,8 +657,7 @@ int export_shallow_folder(afc_client_t afc, const char *src, const char *dst)
         plist_get_string_val(path_node, &path);
         char newPath[PATH_MAX];
         
-        if (strcmp(fmt, "S_IFDIR") != 0)
-        {
+        if (strcmp(fmt, "S_IFDIR") != 0) {
             sprintf(newPath,"%s/%s",dst, basename(path));
             printf("copy file to new path: %s\n", newPath);
             //copy the file!
@@ -681,7 +667,6 @@ int export_shallow_folder(afc_client_t afc, const char *src, const char *dst)
             if (err == AFC_E_SUCCESS) {
                 
                 char *writeMode = write_mode_for_file(path);
-                
                 char buf[CHUNKSZ];
                 uint32_t bytes_read=0;
                 size_t totbytes=0;
@@ -712,14 +697,11 @@ int export_shallow_folder(afc_client_t afc, const char *src, const char *dst)
                  TODO: make it so if we are done with a folder and it is empty, we clear it out!
                  
                  */
-                if (ret == EXIT_SUCCESS)
-                {
-                    if (clean == true)
-                    {
+                if (ret == EXIT_SUCCESS) {
+                    if (clean == true) {
                         fprintf(stderr, "File cloned successfully, clearing original: %s\n", path);
                         rm_file(afc, (char*)path);
                     }
-                    
                 }
                 
             } else {
@@ -727,20 +709,13 @@ int export_shallow_folder(afc_client_t afc, const char *src, const char *dst)
             }
             
         }
-        
-        
-        
     }
-    
-    
-    
     return ret;
 }
 
 //if theres ever a need just to grab a single file and not do a whole clone, this can be used.
 
-int get_afc_path(afc_client_t afc, const char *src, const char *dst)
-{
+int get_afc_path(afc_client_t afc, const char *src, const char *dst) {
     int ret=EXIT_FAILURE;
     
     if (idev_verbose)
@@ -771,7 +746,6 @@ int get_afc_path(afc_client_t afc, const char *src, const char *dst)
         } else {
             fprintf(stderr, "Error opening local file for writing: %s - %s\n", dst, strerror(errno));
         }
-        
         afc_file_close(afc, handle);
     } else {
         fprintf(stderr, "Error: afc open file %s failed: %s\n", src, idev_afc_strerror(err));
@@ -779,14 +753,11 @@ int get_afc_path(afc_client_t afc, const char *src, const char *dst)
         //detection of whether or not the device is currently "locked"
         ret = err;
     }
-    
     return ret;
 }
 
 
-
-int put_afc_path(afc_client_t afc, const char *src, const char *dst)
-{
+int put_afc_path(afc_client_t afc, const char *src, const char *dst) {
     int ret=EXIT_FAILURE;
     
     uint64_t handle=0;
@@ -832,8 +803,7 @@ int put_afc_path(afc_client_t afc, const char *src, const char *dst)
 
 #pragma mark - Command handlers
 
-int do_info(afc_client_t afc, int argc, char **argv)
-{
+int do_info(afc_client_t afc, int argc, char **argv) {
     int i, ret = EXIT_SUCCESS;
     if (argc > 1) {
         for (i=1; i<argc ; i++) {
@@ -847,38 +817,20 @@ int do_info(afc_client_t afc, int argc, char **argv)
     return ret;
 }
 
-int do_list(afc_client_t afc, int argc, char **argv)
-{
+int do_list(afc_client_t afc, int argc, char **argv) {
     int i, ret = EXIT_SUCCESS;
-    
     if (argc > 1) {
         for (i=1; i<argc ; i++) {
             ret |= dump_afc_list_path(afc, argv[i]);
-            /*
-            plist_t *dirInfo = afc_list_path(afc, argv[i], true);
-            char *xmlData = NULL;
-            uint32_t length = 0;
-            plist_to_xml(dirInfo, &xmlData, &length);
-            fprintf(stderr, "%s\n", xmlData);
-             */
         }
     } else {
         ret = dump_afc_list_path(afc, "");
-        /*
-        plist_t *dirInfo = afc_list_path(afc, "", true);
-        char *xmlData = NULL;
-        uint32_t length = 0;
-        plist_to_xml(dirInfo, &xmlData, &length);
-        fprintf(stderr, "%s\n", xmlData);
-         */
     }
-    
     return ret;
 }
 
 
-int do_mkdir(afc_client_t afc, int argc, char **argv)
-{
+int do_mkdir(afc_client_t afc, int argc, char **argv) {
     int i, ret=EXIT_SUCCESS;
     if (argc > 1) {
         for (i=1; i<argc ; i++) {
@@ -903,8 +855,7 @@ int do_mkdir(afc_client_t afc, int argc, char **argv)
 //yeh i suck at C, sorry!
 
 
-int rm_file(afc_client_t afc, char *filePath)
-{
+int rm_file(afc_client_t afc, char *filePath) {
     int ret=EXIT_SUCCESS;
     afc_error_t err = afc_remove_path(afc, filePath);
     
@@ -918,8 +869,7 @@ int rm_file(afc_client_t afc, char *filePath)
     return ret;
 }
 
-int do_rm(afc_client_t afc, int argc, char **argv)
-{
+int do_rm(afc_client_t afc, int argc, char **argv) {
     int i, ret=EXIT_SUCCESS;
     if (argc > 1) {
         for (i=1; i<argc ; i++) {
@@ -940,8 +890,7 @@ int do_rm(afc_client_t afc, int argc, char **argv)
     return ret;
 }
 
-int do_rename(afc_client_t afc, int argc, char **argv)
-{
+int do_rename(afc_client_t afc, int argc, char **argv) {
     int ret = EXIT_FAILURE;
     
     if (argc == 3) {
@@ -961,8 +910,7 @@ int do_rename(afc_client_t afc, int argc, char **argv)
     return ret;
 }
 
-int do_link(afc_client_t afc, int argc, char **argv)
-{
+int do_link(afc_client_t afc, int argc, char **argv) {
     int ret=EXIT_FAILURE;
     
     if (argc == 3) {
@@ -982,8 +930,7 @@ int do_link(afc_client_t afc, int argc, char **argv)
     return ret;
 }
 
-int do_symlink(afc_client_t afc, int argc, char **argv)
-{
+int do_symlink(afc_client_t afc, int argc, char **argv) {
     int ret=EXIT_FAILURE;
     
     if (argc == 3) {
@@ -1003,8 +950,7 @@ int do_symlink(afc_client_t afc, int argc, char **argv)
     return ret;
 }
 
-int do_cat(afc_client_t afc, int argc, char **argv)
-{
+int do_cat(afc_client_t afc, int argc, char **argv) {
     int ret=EXIT_FAILURE;
     
     if (argc == 2) {
@@ -1016,8 +962,7 @@ int do_cat(afc_client_t afc, int argc, char **argv)
     return ret;
 }
 
-int do_get(afc_client_t afc, int argc, char **argv)
-{
+int do_get(afc_client_t afc, int argc, char **argv) {
     int ret=EXIT_FAILURE;
     
     if (argc == 2) {
@@ -1037,8 +982,7 @@ int do_get(afc_client_t afc, int argc, char **argv)
     return ret;
 }
 
-int do_put(afc_client_t afc, int argc, char **argv)
-{
+int do_put(afc_client_t afc, int argc, char **argv) {
     int ret=EXIT_FAILURE;
     
     if (argc == 2) {
@@ -1052,8 +996,7 @@ int do_put(afc_client_t afc, int argc, char **argv)
     return ret;
 }
 
-int list_devices(FILE *outf)
-{
+int list_devices(FILE *outf) {
     int counts = 0;
     afc_idevice_info_t **devices = get_attached_devices(&counts);
     
@@ -1070,9 +1013,7 @@ int list_devices(FILE *outf)
 }
 
 
-
-int recursive_document_list(afc_client_t afc, FILE *outf)
-{
+int recursive_document_list(afc_client_t afc, FILE *outf) {
     plist_t *documentList = afc_list_path(afc, "Documents", true);
     char *xmlData = NULL;
     uint32_t length = 0;
@@ -1081,8 +1022,7 @@ int recursive_document_list(afc_client_t afc, FILE *outf)
     return 0;
 }
 
-int cmd_main(afc_client_t afc, int argc, char **argv)
-{
+int cmd_main(afc_client_t afc, int argc, char **argv) {
     int ret=0;
     
     char *cmd = argv[0];
@@ -1133,7 +1073,11 @@ int cmd_main(afc_client_t afc, int argc, char **argv)
         char *output = argv[2];
         ret = export_shallow_folder(afc, input, output);
     }  else if (!strcmp(cmd, "clone")) {
-        if (hasAppID == false)
+        if (root){
+            char *input = argv[1];
+            char *output = argv[2];
+            ret = clone_afc_path(afc, input, output);
+        } else if (hasAppID == false)
         {
             ret = -1;
             printf("clone requires an appid to be set!\n");
@@ -1162,8 +1106,7 @@ int cmd_main(afc_client_t afc, int argc, char **argv)
 }
 
 #define OPTION_FLAGS "rs:a:u:vhlcR"
-void usage(FILE *outf)
-{
+void usage(FILE *outf) {
     fprintf(outf,
             "Usage: %s [%s] command cmdargs...\n\n"
             "  Options:\n"
@@ -1179,7 +1122,8 @@ void usage(FILE *outf)
             
             "  Where \"command\" and \"cmdargs...\" are as follows:\n\n"
             "  New commands:\n\n"
-            "    clone  [localpath]         clone Documents folder into a local folder. (requires appid)\n"
+            "    clone  [localpath]         clone app Documents folder into a local folder. (requires appid)\n"
+            "    clone  [path] [localpath]  clone rooted directory folder into a local folder. (requires root)\n"
             "    export [path] [localpath]  export a specific directory to a local one (not recursive)\n"
             "    documents                  recursive plist formatted list of entire ~/Documents folder (requires appid)\n\n"
             "  Standard afcclient commands:\n\n"
@@ -1211,10 +1155,10 @@ static struct option longopts[] = {
     { NULL,         0,                      NULL,   0 }
 };
 
-int main(int argc, char **argv)
-{
+int main(int argc, char **argv) {
     progname = basename(argv[0]);
     recursiveList = false;
+    root = false;
     char *appid=NULL, *udid=NULL, *svcname=NULL;;
     hasAppID = false;
     clean = false;
@@ -1224,6 +1168,7 @@ int main(int argc, char **argv)
         switch(flag) {
             case 'r':
                 svcname = AFC2_SERVICE_NAME;
+                root = true;
                 break;
                 
             case 's':
