@@ -60,14 +60,12 @@ bool idev_verbose=false;
 
 char * devices_to_xml(afc_idevice_info_t **devices, int itemCount) {
     
-    
     char *xmlData = NULL;
     uint32_t length = 0;
     int i;
     plist_t deviceList = plist_new_array();
     
-    for (i = 0; i < itemCount; i++)
-    {
+    for (i = 0; i < itemCount; i++) {
         afc_idevice_info_t *currentDevice = devices[i];
         plist_t currentDevicePlist = plist_new_dict();
         
@@ -87,12 +85,9 @@ char * devices_to_xml(afc_idevice_info_t **devices, int itemCount) {
         free(currentDevice);
         plist_array_append_item(deviceList, currentDevicePlist);
         //free(currentDevicePlist);
-        
     }
-    
     plist_to_xml(deviceList, &xmlData, &length);
     return xmlData;
-    
 }
 
 /**
@@ -118,15 +113,13 @@ afc_idevice_info_t * device_get_info(char *uuids) {
             return NULL;
         }
     }
-    else
-    {
+    else {
         ret = idevice_new(&phone, NULL);
         if (ret != IDEVICE_E_SUCCESS) {
             printf("No device found, is it plugged in?\n");
             return NULL;
         }
     }
-    
     if (LOCKDOWN_E_SUCCESS != (simple ?
                                lockdownd_client_new(phone, &client, "libdioxin"):
                                lockdownd_client_new_with_handshake(phone, &client, "libdioxin"))) {
@@ -138,13 +131,12 @@ afc_idevice_info_t * device_get_info(char *uuids) {
     /* run query and output information */
     if(lockdownd_get_value(client, domain, key, &node) == LOCKDOWN_E_SUCCESS) {
         if (node) {
-            
+            /*
             char *xmlData = NULL;
             uint32_t length = 0;
             plist_to_xml(node, &xmlData, &length);
-            
-          //  printf("plist: %s\n", xmlData);
-            
+            printf("plist: %s\n", xmlData);
+            */
             //this is where my lack of C skills peeks out, some of these could probably be re-used rather than
             //all new variables.
             
@@ -162,13 +154,10 @@ afc_idevice_info_t * device_get_info(char *uuids) {
             
             plist_t pt_node = plist_dict_get_item(node, "ProductType");
             
-            if (pt_node != NULL)
-            {
+            if (pt_node != NULL) {
                 plist_get_string_val(pt_node, &pt);
             }
-            
-            if (pt == NULL)
-            {
+            if (pt == NULL) {
                 pt = "not available";
             }
             plist_get_bool_val(plist_dict_get_item(node, "PasswordProtected"), &pwProtected);
@@ -178,12 +167,9 @@ afc_idevice_info_t * device_get_info(char *uuids) {
             plist_get_string_val(plist_dict_get_item(node, "HardwareModel"), &hm);
             plist_get_string_val(plist_dict_get_item(node, "DeviceClass"), &dc);
             plist_t hp_node = plist_dict_get_item(node, "HardwarePlatform");
-            
-            if (hp_node != NULL)
-            {
+            if (hp_node != NULL) {
                 plist_get_string_val(hp_node, &hp);
             }
-            
             if (hp == NULL)
                 hp = "not available";
             
@@ -208,10 +194,7 @@ afc_idevice_info_t * device_get_info(char *uuids) {
                 free(domain);
             lockdownd_client_free(client);
             idevice_free(phone);
-            
             return device_info;
-            
-            
         }
     }
     
@@ -219,7 +202,6 @@ afc_idevice_info_t * device_get_info(char *uuids) {
         free(domain);
     lockdownd_client_free(client);
     idevice_free(phone);
-    
     return 0;
 }
 
@@ -230,8 +212,7 @@ afc_idevice_info_t * device_get_info(char *uuids) {
  
  */
 
-afc_idevice_info_t * first_device_of_type(char *deviceType)
-{
+afc_idevice_info_t * first_device_of_type(char *deviceType) {
     char **dev_list = NULL;
     afc_idevice_info_t *compatDevice = NULL;
     int i;
@@ -244,20 +225,17 @@ afc_idevice_info_t * first_device_of_type(char *deviceType)
         
         afc_idevice_info_t *currentDevice = device_get_info(dev_list[i]);
         char *productType = currentDevice->productType;
-        if (strcmp(productType, deviceType) == 0)
-        {
+        if (strcmp(productType, deviceType) == 0) {
             compatDevice = currentDevice;
         }
     }
     idevice_device_list_free(dev_list);
-    
     return compatDevice;
 }
 
 //deprecated?
 
-char * get_deviceid_from_type(char *deviceType)
-{
+char * get_deviceid_from_type(char *deviceType) {
     
     char **dev_list = NULL;
     char *deviceUDID = NULL;
@@ -336,8 +314,7 @@ char * get_attached_devices_xml(int *deviceCount) {
  */
 
 
-int print_device_xml()
-{
+int print_device_xml() {
     int counts = 0;
     afc_idevice_info_t **devices = get_attached_devices(&counts);
     char *xmlData = devices_to_xml(devices, counts);
@@ -348,15 +325,12 @@ int print_device_xml()
 }
 
 
-int print_device_info()
-{
+int print_device_info() {
     
     int i = 0;
     int counts = 0;
     afc_idevice_info_t **devices = get_attached_devices(&counts);
-    
-    for (i = 0; i < counts; i++)
-    {
+    for (i = 0; i < counts; i++) {
         afc_idevice_info_t *deviceInfo = devices[i];
         printf("device %i of %i uuid: %s\n\n", i+1, counts, deviceInfo->uniqueDeviceID);
         printf("%s hardware model: %s hardware platform: %s\n", deviceInfo->deviceName, deviceInfo->hardwareModel, deviceInfo->hardwarePlatform);
@@ -370,8 +344,7 @@ int print_device_info()
 
 //end of methods shoehorned in from libdioxin
 
-const char *idev_idevice_strerror(idevice_error_t errnum)
-{
+const char *idev_idevice_strerror(idevice_error_t errnum) {
     switch(errnum) {
         case IDEVICE_E_SUCCESS:
             return "SUCCESS";
@@ -390,8 +363,7 @@ const char *idev_idevice_strerror(idevice_error_t errnum)
     }
 }
 
-const char *idev_lockdownd_strerror(lockdownd_error_t errnum)
-{
+const char *idev_lockdownd_strerror(lockdownd_error_t errnum) {
     switch(errnum) {
         case LOCKDOWN_E_SUCCESS:
             return "SUCCESS";
@@ -453,8 +425,7 @@ const char *idev_file_relay_strerror(file_relay_error_t errnum) {
     }
 }
 
-const char *idev_instproxy_strerror(instproxy_error_t errnum)
-{
+const char *idev_instproxy_strerror(instproxy_error_t errnum) {
     switch(errnum) {
         case INSTPROXY_E_SUCCESS:
             return "SUCCESS";
@@ -474,8 +445,7 @@ const char *idev_instproxy_strerror(instproxy_error_t errnum)
     }
 }
 
-const char *idev_afc_strerror(afc_error_t errnum)
-{
+const char *idev_afc_strerror(afc_error_t errnum) {
     switch(errnum) {
         case AFC_E_SUCCESS:
             return "SUCCESS";
@@ -538,8 +508,7 @@ const char *idev_afc_strerror(afc_error_t errnum)
     }
 }
 
-const char *idev_house_arrest_strerror(house_arrest_error_t errnum)
-{
+const char *idev_house_arrest_strerror(house_arrest_error_t errnum) {
     switch(errnum) {
         case HOUSE_ARREST_E_SUCCESS:
             return "SUCCESS";
@@ -570,8 +539,7 @@ const char *idev_house_arrest_strerror(house_arrest_error_t errnum)
 
  
 // note: clientname may be null in which case a default value of "idevtool" is used
-int idev_lockdownd_client(char *clientname, char *udid, int(^callback)(idevice_t idev, lockdownd_client_t client))
-{
+int idev_lockdownd_client(char *clientname, char *udid, int(^callback)(idevice_t idev, lockdownd_client_t client)) {
     int ret=EXIT_FAILURE;
     idevice_t idev = NULL;
 
@@ -680,9 +648,127 @@ int idev_lockdownd_connect_service (
 
 */
 
+void idev_list_installed_apps(idevice_t idevice, bool filterSharing, bool xml) {
+    int simple = 0;
+    plist_t appList = plist_new_array();
+    if (idevice == NULL) {
+        idevice_t phone = NULL;
+        idevice_error_t ret = IDEVICE_E_UNKNOWN_ERROR;
+        ret = idevice_new(&phone, NULL);
+        if (ret != IDEVICE_E_SUCCESS) {
+            printf("No device found, is it plugged in?\n");
+            return;
+        }
+        idevice = phone;
+    }
+    lockdownd_client_t lockd = NULL;
+    if (LOCKDOWN_E_SUCCESS != (simple ?
+                               lockdownd_client_new(idevice, &lockd, "libdioxin"):
+                               lockdownd_client_new_with_handshake(idevice, &lockd, "libdioxin"))) {
+        idevice_free(idevice);
+        return;
+    }
+    lockdownd_service_descriptor_t ldsvc = NULL;
+    if ((lockdownd_start_service(lockd, "com.apple.mobile.installation_proxy", &ldsvc) == LOCKDOWN_E_SUCCESS) && ldsvc) {
+
+        instproxy_client_t ipc = NULL;
+        if (instproxy_client_new(idevice, ldsvc, &ipc) == INSTPROXY_E_SUCCESS) {
+
+            plist_t client_opts = instproxy_client_options_new();
+
+            plist_t apps = NULL;
+            instproxy_error_t err = instproxy_browse(ipc, client_opts, &apps);
+            if (err == INSTPROXY_E_SUCCESS) {
+                uint32_t i;
+                char *xmlData = NULL;
+                uint32_t length = 0;
+                for (i = 0; i < plist_array_get_size(apps); i++) {
+                    char *appid_str = NULL;
+                    char *name_str = NULL, *appType = NULL;
+                    plist_t app_info = plist_array_get_item(apps, i);
+                    plist_t applicationType = plist_dict_get_item(app_info, "ApplicationType");
+                    plist_get_string_val(applicationType, &appType);
+                    plist_t fileSharing = plist_dict_get_item(app_info, "UIFileSharingEnabled");
+                    uint8_t sharing = false;
+                    bool systemApp = false;
+                    if (strcmp(appType, "System") == 0) {
+                        systemApp = true;
+                    }
+                    plist_get_bool_val(fileSharing, &sharing);
+                    plist_t appid_p = plist_dict_get_item(app_info, "CFBundleIdentifier");
+                    if (appid_p)
+                        plist_get_string_val(appid_p, &appid_str);
+                    plist_t disp_p = plist_dict_get_item(app_info, "CFBundleDisplayName");
+                    if (disp_p)
+                        plist_get_string_val(disp_p, &name_str);
+                    /*
+                    char *path_str=NULL;
+                    plist_t path_p = plist_dict_get_item(app_info, "Path");
+                    if (path_p)
+                        plist_get_string_val(path_p, &path_str);
+                    */
+                    //fprintf(stderr, "Identifier: %s, Name: %s Path: %s\n", appid_str, name_str, path_str);
+                    
+                    if (filterSharing == true && sharing == true && systemApp == false){
+                        if (xml){
+                            plist_array_append_item(appList, app_info);
+                        } else {
+                            fprintf(stderr, "%s : %s\n", name_str, appid_str);
+                        }
+                        
+                    } else if (filterSharing == false) {
+                        if (xml){
+
+                            plist_array_append_item(appList, app_info);
+                        } else {
+                            fprintf(stderr, "%s : %s\n", name_str, appid_str);
+                        }
+                    }
+                    if (appid_str)
+                        free(appid_str);
+                    if (name_str)
+                        free(name_str);
+                    
+                }
+                
+                if (xml) {
+                    plist_to_xml(appList, &xmlData, &length);
+                    printf("%s\n", xmlData);
+                    
+                }
+                if (appList) {
+                    plist_free(appList);
+                }
+
+            } else {
+                fprintf(stderr, "Error: Unable to browse applications. Error code %s\n", idev_instproxy_strerror(err));
+            }
+
+            //if (apps)
+              //  plist_free(apps);
+
+            if (client_opts)
+                plist_free(client_opts);
+
+        } else {
+            fprintf(stderr, "Error: Could not connect to installation_proxy!\n");
+        }
+
+        if (ipc)
+            instproxy_client_free(ipc);
+
+    } else {
+        fprintf(stderr, "Error: Could not start com.apple.mobile.installation_proxy!\n");
+    }
+
+    if (ldsvc)
+        lockdownd_service_descriptor_free(ldsvc);
+    
+   
+}
+
 // Retrieve the device local path to the app binary based on its display name or bundle id
-char * idev_get_app_path(idevice_t idevice, lockdownd_client_t lockd, const char *app)
-{
+char * idev_get_app_path(idevice_t idevice, lockdownd_client_t lockd, const char *app) {
     char *ret=NULL;
     char *path_str=NULL;
     char *exec_str=NULL;

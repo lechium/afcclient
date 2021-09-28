@@ -51,6 +51,8 @@ bool hasAppID;
 bool clean;
 bool recursiveList;
 bool root;
+bool xml; //output as xml
+bool fs; //output only apps that have file sharing capabilities
 
 void usage(FILE *outf);
 
@@ -1104,7 +1106,7 @@ int cmd_main(afc_client_t afc, int argc, char **argv) {
     return ret;
 }
 
-#define OPTION_FLAGS "rs:a:u:vhlcR"
+#define OPTION_FLAGS "rs:a:u:vhlcRAfx"
 void usage(FILE *outf) {
     fprintf(outf,
             "Usage: %s [%s] command cmdargs...\n\n"
@@ -1116,6 +1118,9 @@ void usage(FILE *outf) {
             "    -v, --verbose              Enable verbose debug messages\n"
             "    -h, --help                 Display this help message\n"
             "    -l, --list                 List devices\n"
+            "    -A, --apps                 List installed Applications (only applicable when listing applications)\n"
+            "    -f, --filesharing          List Only Applications that have file sharing enabled\n"
+            "    -x, --xml                  Output file/application lists in XML format\n"
             "    -R, --recursive            List the specified folder recursively\n"
             "    -c, --clean                Cleans out folder after exporting/cloning\n\n"
             
@@ -1151,6 +1156,9 @@ static struct option longopts[] = {
     { "list",       no_argument,            NULL,   'l' },
     { "clean",      no_argument,            NULL,   'c' },
     { "recursive",  no_argument,            NULL,   'R' },
+    { "apps",       no_argument,            NULL,   'A' },
+    { "xml",        no_argument,            NULL,   'x' },
+    { "filesharing",no_argument,            NULL,   'f' },
     { NULL,         0,                      NULL,   0 }
 };
 
@@ -1161,6 +1169,8 @@ int main(int argc, char **argv) {
     char *appid=NULL, *udid=NULL, *svcname=NULL;;
     hasAppID = false;
     clean = false;
+    xml = false;
+    fs = false;
     svcname = AFC_SERVICE_NAME;
     int flag;
     while ((flag = getopt_long(argc, argv, OPTION_FLAGS, longopts, NULL)) != -1) {
@@ -1208,6 +1218,19 @@ int main(int argc, char **argv) {
             case 'R':
                 recursiveList = true;
                 break;
+                
+            case 'x':
+                xml = true;
+                break;
+                
+            case 'f':
+                fs = true;
+                break;
+                
+            case 'A':
+                idev_list_installed_apps(NULL, fs, xml);
+                return 0;
+            
             default:
                 usage(stderr);
                 return EXIT_FAILURE;

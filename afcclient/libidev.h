@@ -68,6 +68,8 @@ const char *idev_afc_strerror(afc_error_t errnum);
 
 char * idev_get_app_path(idevice_t idevice, lockdownd_client_t lockd, const char *app);
 
+void idev_list_installed_apps(idevice_t idevice, bool filterSharing, bool xml);
+
 afc_client_t idev_afc_app_client(char *clientname, char *udid, char *appid, int *error);
 
 afc_client_t idev_afc_client(char *clientname, char *udid, char *servicename, int *error);
