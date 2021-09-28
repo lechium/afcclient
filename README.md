@@ -57,7 +57,7 @@ l     1            11    Nov 14 17:20    var -> private/var
 
 ## Usage
 
-    Usage: afcclient [ra:u:vh] command cmdargs...
+    Usage: afcclient [ra:u:vhlRc] command cmdargs...
 
       Options:
         -r, --root                 Use the afc2 server if jailbroken (ignored with -a)
@@ -70,7 +70,7 @@ l     1            11    Nov 14 17:20    var -> private/var
         -c, --clean                Cleans out folder after exporting/cloning
 
       New commands:
-
+        clone  [path] [localpath]  clone directory folder into a local folder. (requires path and localpath)\n"
         clone  [localpath]         clone Documents folder into a local folder. (requires appid)
         export [path] [localpath]  export a specific directory to a local one (not recursive)
         documents                  recursive plist formatted list of entire ~/Documents folder (requires appid)
