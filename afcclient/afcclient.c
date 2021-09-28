@@ -1073,16 +1073,15 @@ int cmd_main(afc_client_t afc, int argc, char **argv) {
         char *output = argv[2];
         ret = export_shallow_folder(afc, input, output);
     }  else if (!strcmp(cmd, "clone")) {
-        if (root){
+        printf("argc: %i\n", argc);
+        if (argc >=3){
             char *input = argv[1];
             char *output = argv[2];
             ret = clone_afc_path(afc, input, output);
-        } else if (hasAppID == false)
-        {
+        } else if (hasAppID == false) {
             ret = -1;
             printf("clone requires an appid to be set!\n");
         } else {
-            
             char *output = argv[1];
             ret = clone_afc_path(afc, "Documents", output);
         }
@@ -1123,7 +1122,7 @@ void usage(FILE *outf) {
             "  Where \"command\" and \"cmdargs...\" are as follows:\n\n"
             "  New commands:\n\n"
             "    clone  [localpath]         clone app Documents folder into a local folder. (requires appid)\n"
-            "    clone  [path] [localpath]  clone rooted directory folder into a local folder. (requires root)\n"
+            "    clone  [path] [localpath]  clone directory folder into a local folder. (requires path and localpath)\n"
             "    export [path] [localpath]  export a specific directory to a local one (not recursive)\n"
             "    documents                  recursive plist formatted list of entire ~/Documents folder (requires appid)\n\n"
             "  Standard afcclient commands:\n\n"
