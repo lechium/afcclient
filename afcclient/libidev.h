@@ -70,14 +70,6 @@ char * idev_get_app_path(idevice_t idevice, lockdownd_client_t lockd, const char
 
 void idev_list_installed_apps(idevice_t idevice, bool filterSharing, bool xml);
 
-afc_client_t idev_afc_app_client(char *clientname, char *udid, char *appid, int *error);
-
-afc_client_t idev_afc_client(char *clientname, char *udid, char *servicename, int *error);
-
-    
-    //gettin rid of blocks!
-    /*
-     
 int idev_lockdownd_client (
         char *clientname,
         char *udid,
@@ -120,7 +112,7 @@ int idev_afc_app_client(
         char *udid,
         char *appid,
         int(^block)(afc_client_t afc) );
-*/
+
     
 #ifdef __cplusplus
 }

@@ -526,88 +526,81 @@ const char *idev_house_arrest_strerror(house_arrest_error_t errnum) {
 
 
 /* 
- 
- rather than whole-sale remove the old methods that used blocks, i figured i would comment them out,
- in case someone with more windows experience than myself found a way to make it easier to get
- clang working with mingw.
+
+ putting blocks back in, makes the code cleaner and easier to use, mingw isn't a thing anymore and I imagine
+ its 64bit replacement is much better with clang now, might play w/ that later.
  
  */
 
-/*
- 
- 
- // note: clientname may be null in which case a default value of "idevtool" is used
- int idev_lockdownd_client(char *clientname, char *udid, int(^callback)(idevice_t idev, lockdownd_client_t client)) {
- int ret=EXIT_FAILURE;
- idevice_t idev = NULL;
- 
- if (!clientname)
- clientname = "idevtool";
- 
- idevice_error_t ierr=idevice_new(&idev, udid);
- 
- if (ierr == IDEVICE_E_SUCCESS && idev) {
- lockdownd_client_t client = NULL;
- lockdownd_error_t ldret = lockdownd_client_new_with_handshake(idev, &client, clientname);
- 
- if (ldret == LOCKDOWN_E_SUCCESS && client) {
- ret = callback(idev, client);
- } else {
- fprintf(stderr, "Error: Can't connect to lockdownd: %s.\n", idev_lockdownd_strerror(ldret));
- }
- 
- if (client)
- lockdownd_client_free(client);
- 
- } else if (ierr == IDEVICE_E_NO_DEVICE) {
- fprintf(stderr, "Error: No device found -- Is it plugged in?\n");
- } else {
- fprintf(stderr, "Error: Cannot connect to device: %s\n", idev_idevice_strerror(ierr));
- }
- 
- if (idev)
- idevice_free(idev);
- 
- return ret;
- }
- */
-/*
- 
- //more commenting out stuff that uses blocks
- 
- // starts a remote lockdownd service instance and returns an initialized lockdownd_service_descriptor_t
- int idev_lockdownd_start_service (
- char *progname,
- char *udid,
- char *servicename,
- int(^block)(idevice_t idev, lockdownd_client_t client, lockdownd_service_descriptor_t ldsvc) )
- {
- return idev_lockdownd_client(progname, udid,
- ^int(idevice_t idev, lockdownd_client_t client)
- {
- int ret=EXIT_FAILURE;
- 
- if (idev_verbose) fprintf(stderr, "[debug] starting '%s' lockdownd service\n", servicename);
- 
- lockdownd_service_descriptor_t ldsvc = NULL;
- lockdownd_error_t ldret = lockdownd_start_service(client, servicename, &ldsvc);
- 
- if ((ldret == LOCKDOWN_E_SUCCESS) && ldsvc) {
- 
- block(idev, client, ldsvc);
- 
- } else {
- fprintf(stderr, "Error: could not start service: %s", servicename);
- }
- 
- if (ldsvc) lockdownd_service_descriptor_free(ldsvc);
- 
- return ret;
- 
- });
- 
- }
- */
+// note: clientname may be null in which case a default value of "idevtool" is used
+int idev_lockdownd_client(char *clientname, char *udid, int(^callback)(idevice_t idev, lockdownd_client_t client)) {
+    int ret=EXIT_FAILURE;
+    idevice_t idev = NULL;
+    
+    if (!clientname)
+        clientname = "idevtool";
+    
+    idevice_error_t ierr=idevice_new(&idev, udid);
+    
+    if (ierr == IDEVICE_E_SUCCESS && idev) {
+        lockdownd_client_t client = NULL;
+        lockdownd_error_t ldret = lockdownd_client_new_with_handshake(idev, &client, clientname);
+        
+        if (ldret == LOCKDOWN_E_SUCCESS && client) {
+            ret = callback(idev, client);
+        } else {
+            fprintf(stderr, "Error: Can't connect to lockdownd: %s.\n", idev_lockdownd_strerror(ldret));
+        }
+        
+        if (client)
+            lockdownd_client_free(client);
+        
+    } else if (ierr == IDEVICE_E_NO_DEVICE) {
+        fprintf(stderr, "Error: No device found -- Is it plugged in?\n");
+    } else {
+        fprintf(stderr, "Error: Cannot connect to device: %s\n", idev_idevice_strerror(ierr));
+    }
+    
+    if (idev)
+        idevice_free(idev);
+    
+    return ret;
+}
+
+
+// starts a remote lockdownd service instance and returns an initialized lockdownd_service_descriptor_t
+int idev_lockdownd_start_service (
+                                  char *progname,
+                                  char *udid,
+                                  char *servicename,
+                                  int(^block)(idevice_t idev, lockdownd_client_t client, lockdownd_service_descriptor_t ldsvc) )
+{
+    return idev_lockdownd_client(progname, udid,
+                                 ^int(idevice_t idev, lockdownd_client_t client)
+                                 {
+        int ret=EXIT_FAILURE;
+        
+        if (idev_verbose) fprintf(stderr, "[debug] starting '%s' lockdownd service\n", servicename);
+        
+        lockdownd_service_descriptor_t ldsvc = NULL;
+        lockdownd_error_t ldret = lockdownd_start_service(client, servicename, &ldsvc);
+        
+        if ((ldret == LOCKDOWN_E_SUCCESS) && ldsvc) {
+            
+            block(idev, client, ldsvc);
+            
+        } else {
+            fprintf(stderr, "Error: could not start service: %s", servicename);
+        }
+        
+        if (ldsvc) lockdownd_service_descriptor_free(ldsvc);
+        
+        return ret;
+        
+    });
+    
+}
+
 
 //trying to re-factor without blocks, it appears this is never even used.
 
@@ -884,324 +877,123 @@ char * idev_get_app_path(idevice_t idevice, lockdownd_client_t lockd, const char
 
 #pragma mark - AFC helpers
 
-
-/* 
- 
- this appears to be used when there is no application being targeted for use with the afc client.
- 
- not creating any direct equivalent because its use case will be covered with idev_afc_client
- 
- */
-
-/*
- 
- int idev_afc_client_ex(
- char *clientname,
- char *udid,
- char *afc_servicename,
- int(^block)(idevice_t idev, lockdownd_client_t client, lockdownd_service_descriptor_t ldsvc, afc_client_t afc) )
- {
- return idev_lockdownd_start_service (
- clientname,
- udid,
- afc_servicename,
- ^int(idevice_t idev, lockdownd_client_t client, lockdownd_service_descriptor_t ldsvc)
- {
- int ret=EXIT_FAILURE;
- afc_client_t afc = NULL;
- afc_error_t afc_err = afc_client_new(idev, ldsvc, &afc);
- 
- if (afc_err == AFC_E_SUCCESS && afc) {
- 
- ret = block(idev, client, ldsvc, afc);
- 
- } else {
- fprintf(stderr, "Error: unable to create afc client: %s\n", idev_afc_strerror(afc_err));
- }
- 
- if (afc) afc_client_free(afc);
- 
- return ret;
- });
- }
- */
-
-//this is for when we don't have a specific app to target, sans blocks.
-
-afc_client_t idev_afc_client(char *clientname, char *udid, char *servicename, int *error)
+int idev_afc_client_ex(
+                       char *clientname,
+                       char *udid,
+                       char *afc_servicename,
+                       int(^block)(idevice_t idev, lockdownd_client_t client, lockdownd_service_descriptor_t ldsvc, afc_client_t afc) )
 {
-    afc_client_t afc = NULL;
-    idevice_t idev = NULL;
-    
-    if (!clientname)
-        clientname = "idevtool";
-    
-    idevice_error_t ierr=idevice_new(&idev, udid);
-    
-    if (ierr == IDEVICE_E_SUCCESS && idev) {
-        lockdownd_client_t client = NULL;
-        lockdownd_error_t ldret = lockdownd_client_new_with_handshake(idev, &client, clientname);
+    return idev_lockdownd_start_service (
+                                         clientname,
+                                         udid,
+                                         afc_servicename,
+                                         ^int(idevice_t idev, lockdownd_client_t client, lockdownd_service_descriptor_t ldsvc)
+                                         {
+        int ret=EXIT_FAILURE;
+        afc_client_t afc = NULL;
+        afc_error_t afc_err = afc_client_new(idev, ldsvc, &afc);
         
-        if (ldret == LOCKDOWN_E_SUCCESS && client) {
+        if (afc_err == AFC_E_SUCCESS && afc) {
             
-            
-            //if (idev_verbose) fprintf(stderr, "[debug] starting '%s' lockdownd service\n", servicename);
-            
-            lockdownd_service_descriptor_t ldsvc = NULL;
-            lockdownd_error_t ldret = lockdownd_start_service(client, servicename, &ldsvc);
-            
-            if ((ldret == LOCKDOWN_E_SUCCESS) && ldsvc) {
-                
-                
-                afc_error_t afc_err = afc_client_new(idev, ldsvc, &afc);
-                if (afc_err == AFC_E_SUCCESS && afc) {
-                    
-                    *error = 0;
-                    return afc;
-                    
-                } else {
-                    
-                    fprintf(stderr, "Error: could not start afc client %s\n", idev_afc_strerror(afc_err));
-                    *error = afc_err;
-                }
-                
-                if (afc)
-                    afc_client_free(afc);
-                
-            } else {
-                fprintf(stderr, "Error: could not start service: %s", servicename);
-                *error = ldret;
-            }
-            
-            if (ldsvc) lockdownd_service_descriptor_free(ldsvc);
-            
-            return afc;
-            
+            ret = block(idev, client, ldsvc, afc);
             
         } else {
-            fprintf(stderr, "Error: Can't connect to lockdownd: %s.\n", idev_lockdownd_strerror(ldret));
+            fprintf(stderr, "Error: unable to create afc client: %s\n", idev_afc_strerror(afc_err));
         }
         
-        if (client)
-            lockdownd_client_free(client);
+        if (afc) afc_client_free(afc);
         
-    } else if (ierr == IDEVICE_E_NO_DEVICE) {
-        fprintf(stderr, "Error: No device found -- Is it plugged in?\n");
-    } else {
-        fprintf(stderr, "Error: Cannot connect to device: %s\n", idev_idevice_strerror(ierr));
-    }
-    
-    if (idev)
-        idevice_free(idev);
-    
-    return afc;
-    
+        return ret;
+    });
 }
 
+int idev_afc_client(char *clientname, char *udid, bool root, int(^block)(afc_client_t afc))
+{
+    return idev_afc_client_ex (
+                               clientname,
+                               udid,
+                               ((root)? AFC2_SERVICE_NAME : AFC_SERVICE_NAME),
+                               ^int(idevice_t i, lockdownd_client_t c, lockdownd_service_descriptor_t l, afc_client_t afc)
+                               {
+        return block(afc);
+    });
+}
 
-//re-written above without blocks.
-
-/*
- 
- int idev_afc_client(char *clientname, char *udid, bool root, int(^block)(afc_client_t afc))
- {
- return idev_afc_client_ex (
- clientname,
- udid,
- ((root)? AFC2_SERVICE_NAME : AFC_SERVICE_NAME),
- ^int(idevice_t i, lockdownd_client_t c, lockdownd_service_descriptor_t l, afc_client_t afc)
- {
- return block(afc);
- });
- }
- */
-
-//re-written without blocks, this is when we ARE targeting a specific application.
-
-afc_client_t idev_afc_app_client(char *clientname, char *udid, char *appid, int *error) {
-    afc_client_t afc=NULL;
-    idevice_t idev = NULL;
-    
-    if (!clientname)
-        clientname = "idevtool";
-    
-    idevice_error_t ierr=idevice_new(&idev, udid);
-    
-    if (ierr == IDEVICE_E_SUCCESS && idev) {
-        lockdownd_client_t client = NULL;
-        lockdownd_error_t ldret = lockdownd_client_new_with_handshake(idev, &client, clientname);
+int idev_afc_app_client(char *clientname, char *udid, char *appid, int(^block)(afc_client_t afc))
+{
+    return idev_lockdownd_client(clientname, udid, ^int(idevice_t idev, lockdownd_client_t client) {
+        int ret = EXIT_FAILURE;
         
-        if (ldret == LOCKDOWN_E_SUCCESS && client) {
-            *error = EXIT_FAILURE;
+        lockdownd_service_descriptor_t ldsvc=NULL;
+        lockdownd_error_t lret = lockdownd_start_service(client, HOUSE_ARREST_SERVICE_NAME, &ldsvc);
+        
+        if (lret == LOCKDOWN_E_SUCCESS && ldsvc) {
             
-            lockdownd_service_descriptor_t ldsvc=NULL;
-            lockdownd_error_t lret = lockdownd_start_service(client, HOUSE_ARREST_SERVICE_NAME, &ldsvc);
+            house_arrest_client_t ha_client=NULL;
+            house_arrest_error_t ha_err = house_arrest_client_new(idev, ldsvc, &ha_client);
             
-            if (lret == LOCKDOWN_E_SUCCESS && ldsvc) {
-                house_arrest_client_t ha_client=NULL;
-                house_arrest_error_t ha_err = house_arrest_client_new(idev, ldsvc, &ha_client);
+            if (ha_err == HOUSE_ARREST_E_SUCCESS && ha_client) {
                 
-                if (ha_err == HOUSE_ARREST_E_SUCCESS && ha_client) {
-                    ha_err = house_arrest_send_command(ha_client, "VendDocuments", appid);
+                ha_err = house_arrest_send_command(ha_client, "VendContainer", appid);
+                
+                if (ha_err == HOUSE_ARREST_E_SUCCESS) {
+                    plist_t dict = NULL;
+                    ha_err = house_arrest_get_result(ha_client, &dict);
                     
-                    if (ha_err == HOUSE_ARREST_E_SUCCESS) {
-                        plist_t dict = NULL;
-                        ha_err = house_arrest_get_result(ha_client, &dict);
+                    if (ha_err == HOUSE_ARREST_E_SUCCESS && dict) {
+                        plist_t errnode = plist_dict_get_item(dict, "Error");
                         
-                        if (ha_err == HOUSE_ARREST_E_SUCCESS && dict) {
-                            plist_t errnode = plist_dict_get_item(dict, "Error");
+                        if (!errnode) {
+                            afc_client_t afc=NULL;
+                            afc_error_t afc_err = afc_client_new_from_house_arrest_client(ha_client, &afc);
                             
-                            if (!errnode) {
-                                afc_client_t afc=NULL;
-                                afc_error_t afc_err = afc_client_new_from_house_arrest_client(ha_client, &afc);
+                            if (afc_err == AFC_E_SUCCESS && afc) {
                                 
-                                if (afc_err == AFC_E_SUCCESS && afc) {
-                                    
-                                    *error = 0;
-                                    return afc;
-                                    
-                                } else {
-                                    fprintf(stderr, "Error: could not get afc client from house arrest: %s\n", idev_afc_strerror(afc_err));
-                                }
-                                
-                                if (afc)
-                                    afc_client_free(afc);
+                                ret = block(afc);
                                 
                             } else {
-                                char *str = NULL;
-                                plist_get_string_val(errnode, &str);
-                                fprintf(stderr, "Error: house_arrest service responded: %s\n", str);
-                                if (strcmp("InstallationLookupFailed", str) == 0)
-                                {
-                                    *error = 20;
-                                }
-                                if (str)
-                                    free(str);
+                                fprintf(stderr, "Error: could not get afc client from house arrest: %s\n", idev_afc_strerror(afc_err));
                             }
+                            
+                            if (afc)
+                                afc_client_free(afc);
+                            
                         } else {
-                            fprintf(stderr, "Error: Could not get result form house_arrest service: %s\n",
-                                    idev_house_arrest_strerror(ha_err));
+                            char *str = NULL;
+                            plist_get_string_val(errnode, &str);
+                            fprintf(stderr, "Error: house_arrest service responded: %s\n", str);
+                            if (strcmp("InstallationLookupFailed", str) == 0)
+                            {
+                                ret = 20;
+                            }
+                            if (str)
+                                free(str);
                         }
-                        
-                        if (dict)
-                            plist_free(dict);
-                        
                     } else {
-                        fprintf(stderr, "Error: Could not send VendContainer command with argument:%s - %s\n",
-                                appid, idev_house_arrest_strerror(ha_err));
+                        fprintf(stderr, "Error: Could not get result form house_arrest service: %s\n",
+                                idev_house_arrest_strerror(ha_err));
                     }
                     
+                    if (dict)
+                        plist_free(dict);
+                    
                 } else {
-                    fprintf(stderr, "Error: Unable to create house arrest client: %s\n", idev_house_arrest_strerror(ha_err));
+                    fprintf(stderr, "Error: Could not send VendContainer command with argument:%s - %s\n",
+                            appid, idev_house_arrest_strerror(ha_err));
                 }
                 
-                if (ha_client)
-                    house_arrest_client_free(ha_client);
-                
             } else {
-                fprintf(stderr, "Error: unable to start service: %s - %s\n", HOUSE_ARREST_SERVICE_NAME, idev_lockdownd_strerror(lret));
+                fprintf(stderr, "Error: Unable to create house arrest client: %s\n", idev_house_arrest_strerror(ha_err));
             }
             
-            return afc;
+            if (ha_client)
+                house_arrest_client_free(ha_client);
+            
         } else {
-            fprintf(stderr, "Error: Can't connect to lockdownd: %s.\n", idev_lockdownd_strerror(ldret));
+            fprintf(stderr, "Error: unable to start service: %s - %s\n", HOUSE_ARREST_SERVICE_NAME, idev_lockdownd_strerror(lret));
         }
         
-        if (client)
-            lockdownd_client_free(client);
-        
-    } else if (ierr == IDEVICE_E_NO_DEVICE) {
-        fprintf(stderr, "Error: No device found -- Is it plugged in?\n");
-    } else {
-        fprintf(stderr, "Error: Cannot connect to device: %s\n", idev_idevice_strerror(ierr));
-    }
-    
-    if (idev)
-        idevice_free(idev);
-    return afc;
+        return ret;
+    });
 }
 
-//definitely use this method, so it needs to be refactored because it uses blocks
-
-//last one to comment out and test to see if stuff still works!!
-
-/*
- 
- int idev_afc_app_client(char *clientname, char *udid, char *appid, int(^block)(afc_client_t afc))
- {
- return idev_lockdownd_client(clientname, udid, ^int(idevice_t idev, lockdownd_client_t client) {
- int ret = EXIT_FAILURE;
- 
- lockdownd_service_descriptor_t ldsvc=NULL;
- lockdownd_error_t lret = lockdownd_start_service(client, HOUSE_ARREST_SERVICE_NAME, &ldsvc);
- 
- if (lret == LOCKDOWN_E_SUCCESS && ldsvc) {
- 
- house_arrest_client_t ha_client=NULL;
- house_arrest_error_t ha_err = house_arrest_client_new(idev, ldsvc, &ha_client);
- 
- if (ha_err == HOUSE_ARREST_E_SUCCESS && ha_client) {
- 
- ha_err = house_arrest_send_command(ha_client, "VendContainer", appid);
- 
- if (ha_err == HOUSE_ARREST_E_SUCCESS) {
- plist_t dict = NULL;
- ha_err = house_arrest_get_result(ha_client, &dict);
- 
- if (ha_err == HOUSE_ARREST_E_SUCCESS && dict) {
- plist_t errnode = plist_dict_get_item(dict, "Error");
- 
- if (!errnode) {
- afc_client_t afc=NULL;
- afc_error_t afc_err = afc_client_new_from_house_arrest_client(ha_client, &afc);
- 
- if (afc_err == AFC_E_SUCCESS && afc) {
- 
- ret = block(afc);
- 
- } else {
- fprintf(stderr, "Error: could not get afc client from house arrest: %s\n", idev_afc_strerror(afc_err));
- }
- 
- if (afc)
- afc_client_free(afc);
- 
- } else {
- char *str = NULL;
- plist_get_string_val(errnode, &str);
- fprintf(stderr, "Error: house_arrest service responded: %s\n", str);
- if (strcmp("InstallationLookupFailed", str) == 0)
- {
- ret = 20;
- }
- if (str)
- free(str);
- }
- } else {
- fprintf(stderr, "Error: Could not get result form house_arrest service: %s\n",
- idev_house_arrest_strerror(ha_err));
- }
- 
- if (dict)
- plist_free(dict);
- 
- } else {
- fprintf(stderr, "Error: Could not send VendContainer command with argument:%s - %s\n",
- appid, idev_house_arrest_strerror(ha_err));
- }
- 
- } else {
- fprintf(stderr, "Error: Unable to create house arrest client: %s\n", idev_house_arrest_strerror(ha_err));
- }
- 
- if (ha_client)
- house_arrest_client_free(ha_client);
- 
- } else {
- fprintf(stderr, "Error: unable to start service: %s - %s\n", HOUSE_ARREST_SERVICE_NAME, idev_lockdownd_strerror(lret));
- }
- 
- return ret;
- });
- }
- */

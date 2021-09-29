@@ -1273,37 +1273,16 @@ int main(int argc, char **argv) {
     }
     
     if (appid) {
-        // return idev_afc_app_client(progname, udid, appid, ^int(afc_client_t afc) {
-        //   return cmd_main(afc, argc, argv);
-        //});
-        int error;
-        afc_client_t afc = idev_afc_app_client(progname, udid, appid, &error);
-        
-        if (afc == NULL)
-        {
-            return EXIT_FAILURE;
-        }
-        return cmd_main(afc, argc, argv);
-        
+         return idev_afc_app_client(progname, udid, appid, ^int(afc_client_t afc) {
+           return cmd_main(afc, argc, argv);
+        });
         
     } else {
         
         //no appid
-        int error;
-        
-        afc_client_t afc = idev_afc_client(progname, udid, svcname, &error);
-        
-        //afc_client_t afc = idev_afc_app_client(progname, udid, appid, &error);
-        
-        if (afc == NULL)
-        {
-            return EXIT_FAILURE;
-        }
+        return idev_afc_client_ex(progname, udid, svcname, ^int(idevice_t idev, lockdownd_client_t client, lockdownd_service_descriptor_t ldsvc, afc_client_t afc) {
         return cmd_main(afc, argc, argv);
-        
-        //return idev_afc_client_ex(progname, udid, svcname, ^int(idevice_t idev, lockdownd_client_t client, l//ockdownd_service_descriptor_t ldsvc, afc_client_t afc) {
-        //return cmd_main(afc, argc, argv);
-        //  });
+          });
     }
 }
 
