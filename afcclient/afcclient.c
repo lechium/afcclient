@@ -56,6 +56,8 @@ bool fs; //output only apps that have file sharing capabilities
 char *udid;
 bool appMode;
 
+double AFVersionNumber = 1.0;
+
 void usage(FILE *outf);
 
 bool is_dir(char *path) {
@@ -1070,7 +1072,7 @@ int cmd_main(afc_client_t afc, int argc, char **argv) {
 #define OPTION_FLAGS "rs:a:u:vhlcRAfx"
 void usage(FILE *outf) {
     fprintf(outf,
-            "Usage: %s [%s] command cmdargs...\n\n"
+            "Usage: %s %.1f [%s] command cmdargs...\n\n"
             "  Options:\n"
             "    -r, --root                 Use the afc2 server if jailbroken (ignored with -a)\n"
             "    -s, --service=NAME>        Use the specified lockdown service (ignored with -a)\n"
@@ -1103,7 +1105,7 @@ void usage(FILE *outf) {
             "    cat <path>                 cat contents of <path> to stdout\n"
             "    get <path> [localpath]     download a file (default: current dir)\n"
             "    put <localpath> [path]     upload a file (default: remote top-level dir)\n\n"
-            , progname, OPTION_FLAGS);
+            , progname, AFVersionNumber, OPTION_FLAGS);
 }
 
 
