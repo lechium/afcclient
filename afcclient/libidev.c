@@ -6,7 +6,7 @@
  * just a set of helper functions for and wrappers around the
  * libimobiledevice library -- often making gratuitous and
  * obscene use of clang blocks.
- * 
+ *
  * updated in 2014 by Kevin Bradley to remove gratuitous blocks and add
  * some code written in an unreleased project in 2010.
  *
@@ -149,11 +149,8 @@ afc_idevice_info_t * device_get_info(char *uuids) {
             char *ud = NULL;
             char *dc = NULL;
             uint64_t uc;
-            
             uint8_t pwProtected = false;
-            
             plist_t pt_node = plist_dict_get_item(node, "ProductType");
-            
             if (pt_node != NULL) {
                 plist_get_string_val(pt_node, &pt);
             }
@@ -170,11 +167,11 @@ afc_idevice_info_t * device_get_info(char *uuids) {
             if (hp_node != NULL) {
                 plist_get_string_val(hp_node, &hp);
             }
-            if (hp == NULL)
+            if (hp == NULL) {
                 hp = "not available";
-            
+            }
             plist_get_string_val(plist_dict_get_item(node, "UniqueDeviceID"), &ud);
-            plist_get_uint_val( plist_dict_get_item(node, "UniqueChipID"), &uc);
+            plist_get_uint_val(plist_dict_get_item(node, "UniqueChipID"), &uc);
             
             device_info->buildVersion = bv;
             device_info->productType = pt;
@@ -190,8 +187,9 @@ afc_idevice_info_t * device_get_info(char *uuids) {
             plist_free(pt_node);
             plist_free(hp_node);
             
-            if (domain != NULL)
+            if (domain != NULL) {
                 free(domain);
+            }
             lockdownd_client_free(client);
             idevice_free(phone);
             return device_info;
@@ -675,7 +673,12 @@ void idev_list_installed_apps(idevice_t idevice, bool filterSharing, bool xml) {
         if (instproxy_client_new(idevice, ldsvc, &ipc) == INSTPROXY_E_SUCCESS) {
             
             plist_t client_opts = instproxy_client_options_new();
-            
+            /*          "ApplicationType" -> "System"
+             *          "ApplicationType" -> "User"
+             *          "ApplicationType" -> "Internal"
+             *          "ApplicationType" -> "Any"
+             */
+            plist_dict_set_item(client_opts, "ApplicationType", plist_new_string("Any"));
             plist_t apps = NULL;
             instproxy_error_t err = instproxy_browse(ipc, client_opts, &apps);
             if (err == INSTPROXY_E_SUCCESS) {
@@ -683,18 +686,18 @@ void idev_list_installed_apps(idevice_t idevice, bool filterSharing, bool xml) {
                 char *xmlData = NULL;
                 uint32_t length = 0;
                 for (i = 0; i < plist_array_get_size(apps); i++) {
-                    char *appid_str = NULL;
-                    char *name_str = NULL, *appType = NULL;
-                    plist_t app_info = plist_array_get_item(apps, i);
-                    plist_t applicationType = plist_dict_get_item(app_info, "ApplicationType");
-                    plist_get_string_val(applicationType, &appType);
-                    plist_t fileSharing = plist_dict_get_item(app_info, "UIFileSharingEnabled");
+                    char *appid_str = NULL, *name_str = NULL, *appType = NULL;
                     uint8_t sharing = false;
+                    
+                    
+                    
+                    plist_t app_info = plist_array_get_item(apps, i);
+                    plist_get_string_val(plist_dict_get_item(app_info, "ApplicationType"), &appType);
+                    plist_get_bool_val(plist_dict_get_item(app_info, "UIFileSharingEnabled"), &sharing);
                     bool systemApp = false;
                     if (strcmp(appType, "System") == 0) {
                         systemApp = true;
                     }
-                    plist_get_bool_val(fileSharing, &sharing);
                     plist_t appid_p = plist_dict_get_item(app_info, "CFBundleIdentifier");
                     if (appid_p)
                         plist_get_string_val(appid_p, &appid_str);
@@ -747,24 +750,23 @@ void idev_list_installed_apps(idevice_t idevice, bool filterSharing, bool xml) {
             //if (apps)
             //  plist_free(apps);
             
-            if (client_opts)
+            if (client_opts) {
                 plist_free(client_opts);
-            
+            }
         } else {
             fprintf(stderr, "Error: Could not connect to installation_proxy!\n");
         }
         
-        if (ipc)
+        if (ipc) {
             instproxy_client_free(ipc);
-        
+        }
     } else {
         fprintf(stderr, "Error: Could not start com.apple.mobile.installation_proxy!\n");
     }
     
-    if (ldsvc)
+    if (ldsvc){
         lockdownd_service_descriptor_free(ldsvc);
-    
-    
+    }
 }
 
 // Retrieve the device local path to the app binary based on its display name or bundle id
@@ -796,13 +798,13 @@ char * idev_get_app_path(idevice_t idevice, lockdownd_client_t lockd, const char
                     
                     plist_t app_info = plist_array_get_item(apps, i);
                     plist_t appid_p = plist_dict_get_item(app_info, "CFBundleIdentifier");
-                    if (appid_p)
+                    if (appid_p){
                         plist_get_string_val(appid_p, &appid_str);
-                    
+                    }
                     plist_t disp_p = plist_dict_get_item(app_info, "CFBundleDisplayName");
-                    if (disp_p)
+                    if (disp_p) {
                         plist_get_string_val(disp_p, &name_str);
-                    
+                    }
                     if (appid_str && strcmp(app, appid_str) == 0) {
                         if (!app_found)
                             app_found = app_info;
@@ -811,17 +813,19 @@ char * idev_get_app_path(idevice_t idevice, lockdownd_client_t lockd, const char
                     }
                     
                     if (name_str && strcmp(app, name_str) == 0) {
-                        if (!app_found)
+                        if (!app_found) {
                             app_found = app_info;
-                        else
+                        } else {
                             fprintf(stderr, "Error: ambigous app name: %s\n", app);
+                        }
                     }
                     
-                    if (appid_str)
+                    if (appid_str) {
                         free(appid_str);
-                    
-                    if (name_str)
+                    }
+                    if (name_str) {
                         free(name_str);
+                    }
                 }
                 
                 if (app_found) {
@@ -842,27 +846,27 @@ char * idev_get_app_path(idevice_t idevice, lockdownd_client_t lockd, const char
                 fprintf(stderr, "Error: Unable to browse applications. Error code %s\n", idev_instproxy_strerror(err));
             }
             
-            if (apps)
+            if (apps) {
                 plist_free(apps);
-            
-            if (client_opts)
+            }
+            if (client_opts) {
                 plist_free(client_opts);
-            
+            }
         } else {
             fprintf(stderr, "Error: Could not connect to installation_proxy!\n");
         }
         
-        if (ipc)
+        if (ipc) {
             instproxy_client_free(ipc);
+        }
         
     } else {
         fprintf(stderr, "Error: Could not start com.apple.mobile.installation_proxy!\n");
     }
     
-    if (ldsvc)
+    if (ldsvc) {
         lockdownd_service_descriptor_free(ldsvc);
-    
-    
+    }
     if (path_str) {
         if (exec_str) {
             //  asprintf(&ret, "%s/%s", path_str, exec_str);
@@ -871,11 +875,9 @@ char * idev_get_app_path(idevice_t idevice, lockdownd_client_t lockd, const char
         } else {
             fprintf(stderr, "Error: bundle executable not found\n");
         }
-        
     } else {
         fprintf(stderr, "Error: app path not found\n");
     }
-    
     return ret;
 }
 
@@ -1007,7 +1009,7 @@ afc_client_t idev_afc_client(char *clientname, char *udid, char *servicename, in
  clientname,
  udid,
  ((root)? AFC2_SERVICE_NAME : AFC_SERVICE_NAME),
- ^int(idevice_t i, lockdownd_client_t c, lockdownd_service_descriptor_t l, afc_client_t afc) 
+ ^int(idevice_t i, lockdownd_client_t c, lockdownd_service_descriptor_t l, afc_client_t afc)
  {
  return block(afc);
  });
@@ -1016,8 +1018,7 @@ afc_client_t idev_afc_client(char *clientname, char *udid, char *servicename, in
 
 //re-written without blocks, this is when we ARE targeting a specific application.
 
-afc_client_t idev_afc_app_client(char *clientname, char *udid, char *appid, int *error)
-{
+afc_client_t idev_afc_app_client(char *clientname, char *udid, char *appid, int *error) {
     afc_client_t afc=NULL;
     idevice_t idev = NULL;
     
@@ -1117,10 +1118,6 @@ afc_client_t idev_afc_app_client(char *clientname, char *udid, char *appid, int 
     
     if (idev)
         idevice_free(idev);
-    
-    
-    
-    
     return afc;
 }
 
@@ -1189,7 +1186,7 @@ afc_client_t idev_afc_app_client(char *clientname, char *udid, char *appid, int 
  plist_free(dict);
  
  } else {
- fprintf(stderr, "Error: Could not send VendContainer command with argument:%s - %s\n", 
+ fprintf(stderr, "Error: Could not send VendContainer command with argument:%s - %s\n",
  appid, idev_house_arrest_strerror(ha_err));
  }
  

@@ -53,6 +53,8 @@ bool recursiveList;
 bool root;
 bool xml; //output as xml
 bool fs; //output only apps that have file sharing capabilities
+char *udid;
+bool appMode;
 
 void usage(FILE *outf);
 
@@ -273,6 +275,17 @@ int dump_afc_file_info(afc_client_t afc, const char *path) {
     if (strcmp(path, "..") == 0 || strcmp(path, "." ) == 0 || strstr(path, "/..") || strstr(path, "/.")){
         return ret;
     }
+    
+    if (xml) {
+        plist_t *documentList = afc_list_path(afc, path, recursiveList);
+        char *xmlData = NULL;
+        uint32_t length = 0;
+        plist_to_xml(documentList, &xmlData, &length);
+        printf("%s", xmlData);
+        return 0;
+        //fprintf(outf, "%s\n", xmlData);
+    }
+    
     plist_t *node = afc_file_info_for_path(afc, path);
     if (node){
         char displayString[PATH_MAX];
@@ -1166,7 +1179,9 @@ int main(int argc, char **argv) {
     progname = basename(argv[0]);
     recursiveList = false;
     root = false;
-    char *appid=NULL, *udid=NULL, *svcname=NULL;;
+    udid = NULL;
+    appMode = false;
+    char *appid=NULL, *svcname=NULL;;
     hasAppID = false;
     clean = false;
     xml = false;
@@ -1228,9 +1243,9 @@ int main(int argc, char **argv) {
                 break;
                 
             case 'A':
-                idev_list_installed_apps(NULL, fs, xml);
-                return 0;
-            
+                appMode = true;
+                break;
+                
             default:
                 usage(stderr);
                 return EXIT_FAILURE;
@@ -1241,10 +1256,20 @@ int main(int argc, char **argv) {
     argc -= optind;
     argv += optind;
     
-    if (argc < 1) {
+    if (argc < 1 && appMode == false) {
         fprintf(stderr, "Missing command argument\n");
         usage(stderr);
         return EXIT_FAILURE;
+    }
+    
+    if (appMode) {
+        idevice_t phone = NULL;
+        if (udid) {
+            idevice_error_t ret = IDEVICE_E_UNKNOWN_ERROR;
+            ret = idevice_new(&phone, NULL);
+        }
+        idev_list_installed_apps(phone, fs, xml);
+        return 0;
     }
     
     if (appid) {
