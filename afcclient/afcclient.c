@@ -42,6 +42,9 @@
 
 #include "libidev.h"
 
+#include <sys/stat.h>
+#include <sys/types.h>
+
 #define CHUNKSZ 8192
 
 #pragma mark - AFC Implementation Utility Functions
@@ -59,6 +62,35 @@ bool appMode;
 double AFVersionNumber = 1.0;
 
 void usage(FILE *outf);
+
+// A nice loading bar. Credits: classdump-dyld
+static inline void loadBar(off_t x, off_t n, int r, int w,const char *className)
+{
+    
+    //    return;
+    // Only update r times.
+    if ((n/r)<1){
+        return;
+    }
+    
+    // Calculuate the ratio of complete-to-incomplete.
+    float ratio = x/(float)n;
+    int   c     = ratio * w;
+    
+    // Show the percentage complete.
+    printf("%3d%% [", (int)(ratio*100) );
+    
+    // Show the load bar.
+    for (int x=0; x<c; x++)
+        printf("=");
+    
+    for (int x=c; x<w; x++)
+        printf(" ");
+    
+    // ANSI Control codes to go back to the
+    // previous line and clear it.
+    printf("] %.0lld/%.0lld <%s>\n\033[F\033[J",x/1024/1024,n/1024/1024,className);
+}
 
 bool is_dir(char *path) {
     struct stat s;
@@ -687,6 +719,13 @@ int get_afc_path(afc_client_t afc, const char *src, const char *dst) {
         fprintf(stderr, "[debug] Downloading %s to %s - creating afc file connection\n", src, dst);
     
     uint64_t handle=0;
+    plist_t *node = afc_file_info_for_path(afc, src);
+    off_t fsize = 0;
+    if (node){
+        char *size = NULL;
+        plist_get_string_val(plist_dict_get_item(node, "st_size"), &size);
+        fsize = atol(size);
+    }
     afc_error_t err = afc_file_open(afc, src, AFC_FOPEN_RDONLY, &handle);
     
     if (err == AFC_E_SUCCESS) {
@@ -698,6 +737,9 @@ int get_afc_path(afc_client_t afc, const char *src, const char *dst) {
         if (outf) {
             while((err=afc_file_read(afc, handle, buf, CHUNKSZ, &bytes_read)) == AFC_E_SUCCESS && bytes_read > 0) {
                 totbytes += fwrite(buf, 1, bytes_read, outf);
+                if (fsize > 0){
+                    loadBar(totbytes, fsize, 100, 50,basename((char*)src));
+                }
             }
             fclose(outf);
             if (err) {
@@ -721,12 +763,24 @@ int get_afc_path(afc_client_t afc, const char *src, const char *dst) {
     return ret;
 }
 
+off_t fsize(const char *filename) {
+    struct stat st;
+    
+    if (stat(filename, &st) == 0)
+        return st.st_size;
+    
+    return -1;
+}
 
 int put_afc_path(afc_client_t afc, const char *src, const char *dst) {
     int ret=EXIT_FAILURE;
     
     uint64_t handle=0;
-    
+    struct stat st;
+    off_t fsize = 0;
+    if (stat(src, &st) == 0) {
+        fsize = st.st_size;
+    }
     FILE *inf = fopen(src, "r");
     if (inf) {
         if (idev_verbose)
@@ -743,6 +797,7 @@ int put_afc_path(afc_client_t afc, const char *src, const char *dst) {
                 uint32_t bytes_written=0;
                 err=afc_file_write(afc, handle, buf, (uint32_t)bytes_read, &bytes_written);
                 totbytes += bytes_written;
+                loadBar(totbytes, fsize, 100, 50,basename((char*)src));
             }
             
             if (err) {
@@ -1223,16 +1278,16 @@ int main(int argc, char **argv) {
     }
     
     if (appid) {
-         return idev_afc_app_client(progname, udid, appid, ^int(afc_client_t afc) {
-           return cmd_main(afc, argc, argv);
+        return idev_afc_app_client(progname, udid, appid, ^int(afc_client_t afc) {
+            return cmd_main(afc, argc, argv);
         });
         
     } else {
         
         //no appid
         return idev_afc_client_ex(progname, udid, svcname, ^int(idevice_t idev, lockdownd_client_t client, lockdownd_service_descriptor_t ldsvc, afc_client_t afc) {
-        return cmd_main(afc, argc, argv);
-          });
+            return cmd_main(afc, argc, argv);
+        });
     }
 }
 
