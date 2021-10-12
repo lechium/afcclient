@@ -92,6 +92,11 @@ static inline void loadBar(off_t x, off_t n, int r, int w,const char *className)
     printf("] %.0lld/%.0lld <%s>\n\033[F\033[J",x/1024/1024,n/1024/1024,className);
 }
 
+bool fileExists(const char* file) {
+    struct stat buf;
+    return (stat(file, &buf) == 0);
+}
+
 bool is_dir(char *path) {
     struct stat s;
     return (stat(path, &s) == 0 && s.st_mode & S_IFDIR);
@@ -516,15 +521,13 @@ int clone_afc_path(afc_client_t afc, const char *src, const char *dst) {
         fprintf(stderr, "[debug] Cloning %s to %s - creating afc file connection\n", src, dst);
     
     plist_t fileList = afc_list_path(afc, src, true);
-    
     int fileCount = plist_array_get_size(fileList);
-    
     if (idev_verbose)
         printf("fileCount: %i\n", fileCount);
     
     int i;
     
-    //make documents folders
+    //make documents folders. FIXME: refactor this, since cloning works on any folder now we might not need a Documents folder.
     
     char documentsPath[PATH_MAX];
     sprintf(documentsPath,"%s/Documents",dst);
@@ -549,6 +552,9 @@ int clone_afc_path(afc_client_t afc, const char *src, const char *dst) {
         plist_t item = plist_array_get_item(fileList, i);
         plist_t path_node = plist_dict_get_item(item, "path");
         plist_t fmt_node = plist_dict_get_item(item, "st_ifmt");
+        char *size = NULL;
+        plist_get_string_val(plist_dict_get_item(item, "st_size"), &size);
+        long fsize = atol(size);
         char *fmt = NULL;
         plist_get_string_val(fmt_node, &fmt);
         plist_get_string_val(path_node, &path);
@@ -568,8 +574,14 @@ int clone_afc_path(afc_client_t afc, const char *src, const char *dst) {
 #endif
             printf("mkdir at new path: %s\n", newPath);
         } else {
-            
+           
             sprintf(newPath,"%s/%s",dst, path);
+            char *dir = dirname(path);
+            if (!fileExists(dir)){
+                char sys[PATH_MAX];
+                sprintf(sys, "/bin/mkdir -p %s", dir);
+                system(sys);
+            }
             printf("copy file to new path: %s\n", newPath);
             //copy the file!
             uint64_t handle=0;
@@ -587,6 +599,9 @@ int clone_afc_path(afc_client_t afc, const char *src, const char *dst) {
                 if (outf) {
                     while((err=afc_file_read(afc, handle, buf, CHUNKSZ, &bytes_read)) == AFC_E_SUCCESS && bytes_read > 0) {
                         totbytes += fwrite(buf, 1, bytes_read, outf);
+                        if (fsize > 0){
+                            loadBar(totbytes, fsize, 100, 50,basename((char*)src));
+                        }
                     }
                     fclose(outf);
                     if (err) {
@@ -650,6 +665,9 @@ int export_shallow_folder(afc_client_t afc, const char *src, const char *dst) {
         plist_t path_node = plist_dict_get_item(item, "path");
         plist_t fmt_node = plist_dict_get_item(item, "st_ifmt");
         char *fmt = NULL;
+        char *size = NULL;
+        plist_get_string_val(plist_dict_get_item(item, "st_size"), &size);
+        long fsize = atol(size);
         plist_get_string_val(fmt_node, &fmt);
         plist_get_string_val(path_node, &path);
         char newPath[PATH_MAX];
@@ -672,6 +690,9 @@ int export_shallow_folder(afc_client_t afc, const char *src, const char *dst) {
                 if (outf) {
                     while((err=afc_file_read(afc, handle, buf, CHUNKSZ, &bytes_read)) == AFC_E_SUCCESS && bytes_read > 0) {
                         totbytes += fwrite(buf, 1, bytes_read, outf);
+                        if (fsize > 0){
+                            loadBar(totbytes, fsize, 100, 50,basename((char*)src));
+                        }
                     }
                     fclose(outf);
                     if (err) {
@@ -1093,7 +1114,7 @@ int cmd_main(afc_client_t afc, int argc, char **argv) {
         char *output = argv[2];
         ret = export_shallow_folder(afc, input, output);
     }  else if (!strcmp(cmd, "clone")) {
-        printf("argc: %i\n", argc);
+        //printf("argc: %i\n", argc);
         if (argc >=3){
             char *input = argv[1];
             char *output = argv[2];
