@@ -281,29 +281,6 @@ plist_t * afc_list_path(afc_client_t afc, const char *path, int8_t recursive) {
     return fileList;
 }
 
-int dump_afc_file_info_old(afc_client_t afc, const char *path) {
-    int i, ret=EXIT_FAILURE;
-    
-    char **infolist=NULL;
-    afc_error_t err = afc_get_file_info(afc, path, &infolist);
-    
-    if (err == AFC_E_SUCCESS && infolist) {
-        for(i=0; infolist[i]; i++)
-        printf("%c%s", ((i%2)? '=' : ' '), infolist[i]);
-        
-        printf("\t%s\n", path);
-        ret=EXIT_SUCCESS;
-        
-    } else {
-        fprintf(stderr, "Error: info error for path: %s - %s\n", path, idev_afc_strerror(err));
-    }
-    
-    if (infolist)
-        idevice_device_list_free(infolist);
-    
-    return ret;
-}
-
 /*
  
  much prettier now!
@@ -423,7 +400,6 @@ int dump_afc_list_path(afc_client_t afc, const char *path) {
     
     return ret;
 }
-
 
 int dump_afc_path(afc_client_t afc, const char *path, FILE *outf) {
     int ret=EXIT_FAILURE;

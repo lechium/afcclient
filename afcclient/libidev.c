@@ -601,10 +601,6 @@ int idev_lockdownd_start_service (
     
 }
 
-
-//trying to re-factor without blocks, it appears this is never even used.
-
-/*
  
  // connects to a lockdownd service by name and returns an initialized idevice_connection_t
  int idev_lockdownd_connect_service (
@@ -612,32 +608,32 @@ int idev_lockdownd_start_service (
  char *udid,
  char *servicename,
  int(^block)(idevice_t idev, lockdownd_service_descriptor_t ldsvc, idevice_connection_t con) )
- {
- return idev_lockdownd_start_service(progname, udid, servicename,
- ^int(idevice_t idev, lockdownd_client_t client, lockdownd_service_descriptor_t ldsvc)
- {
- int ret=EXIT_FAILURE;
+{
+    return idev_lockdownd_start_service(progname, udid, servicename,
+                                        ^int(idevice_t idev, lockdownd_client_t client, lockdownd_service_descriptor_t ldsvc)
+                                        {
+        int ret=EXIT_FAILURE;
+        
+        if (idev_verbose) fprintf(stderr, "[debug] connecting to service: %s\n", servicename);
+        
+        idevice_connection_t con=NULL;
+        idevice_error_t ierr = idevice_connect(idev, ldsvc->port, &con);
+        if (ierr == IDEVICE_E_SUCCESS && con) {
+            if (idev_verbose) fprintf(stderr, "[debug] successfully connected to %s\n", servicename);
+            
+            ret = block(idev, ldsvc, con);
+            
+        } else {
+            fprintf(stderr, "Error: could not connect to lockdownd service");
+        }
+        
+        if (con) idevice_disconnect(con);
+        
+        return ret;
+    });
+}
  
- if (idev_verbose) fprintf(stderr, "[debug] connecting to service: %s\n", servicename);
  
- idevice_connection_t con=NULL;
- idevice_error_t ierr = idevice_connect(idev, ldsvc->port, &con);
- if (ierr == IDEVICE_E_SUCCESS && con) {
- if (idev_verbose) fprintf(stderr, "[debug] successfully connected to %s\n", servicename);
- 
- ret = block(idev, ldsvc, con);
- 
- } else {
- fprintf(stderr, "Error: could not connect to lockdownd service");
- }
- 
- if (con) idevice_disconnect(con);
- 
- return ret;
- });
- }
- 
- */
 
 void idev_list_installed_apps(idevice_t idevice, bool filterSharing, bool xml) {
     int simple = 0;
