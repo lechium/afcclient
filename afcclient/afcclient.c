@@ -58,38 +58,33 @@ bool xml; //output as xml
 bool fs; //output only apps that have file sharing capabilities
 char *udid;
 bool appMode;
+bool quiet;
 
-double AFVersionNumber = 1.0;
+char * AFVersionNumber = "1.0.1";
 
 void usage(FILE *outf);
 
+//loadBar(totbytes, fsize, 50,basename((char*)src));
+
 // A nice loading bar. Credits: classdump-dyld
-static inline void loadBar(off_t x, off_t n, int r, int w,const char *className)
-{
-    
-    //    return;
-    // Only update r times.
-    if ((n/r)<1){
-        return;
-    }
-    
+static inline void loadBar(off_t currentValue, off_t totalValue, int width,const char *fileName) {
+    if (quiet) return;
     // Calculuate the ratio of complete-to-incomplete.
-    float ratio = x/(float)n;
-    int   c     = ratio * w;
-    
+    float ratio = currentValue/(float)totalValue;
+    int   elapsed     = ratio * width;
     // Show the percentage complete.
     printf("%3d%% [", (int)(ratio*100) );
     
     // Show the load bar.
-    for (int x=0; x<c; x++)
+    for (int x=0; x<elapsed; x++)
         printf("=");
     
-    for (int x=c; x<w; x++)
+    for (int x=elapsed; x<width; x++)
         printf(" ");
     
     // ANSI Control codes to go back to the
     // previous line and clear it.
-    printf("] %.0lld/%.0lld <%s>\n\033[F\033[J",x/1024/1024,n/1024/1024,className);
+    printf("] %.0lld/%.0lld MB <%s>\n\033[F\033[J",currentValue/1024/1024,totalValue/1024/1024,fileName);
 }
 
 bool fileExists(const char* file) {
@@ -507,9 +502,6 @@ char * write_mode_for_file(char *filename) {
  
  
  this method will loop recursively through the entire src path and output it to the destination
- 
- it SHOULD work cross platform (once i comment the win32 stuff back in)
- 
  TODO: check for permissions on file folder creation on the selected directory.
  
  */
@@ -526,40 +518,25 @@ int clone_afc_path(afc_client_t afc, const char *src, const char *dst) {
         printf("fileCount: %i\n", fileCount);
     
     int i;
-    
-    //make documents folders. FIXME: refactor this, since cloning works on any folder now we might not need a Documents folder.
-    
-    char documentsPath[PATH_MAX];
-    sprintf(documentsPath,"%s/Documents",dst);
-    
-    
     //windows mkdir is different!
     
 #if defined(_WIN32)
     
     _mkdir(dst);
-    _mkdir(documentsPath);
     
 #else
-    //sprintf(newPath,"%s/%s/",dst, path);
     mkdir(dst, 0777); // notice that 777 is different than 0777
-    mkdir(documentsPath, 0777); // notice that 777 is different than 0777
     
 #endif
     
     for (i = 0; i < fileCount; i++) {
-        char *path = NULL;
+        char *path = NULL, *fmt = NULL, *size = NULL;
         plist_t item = plist_array_get_item(fileList, i);
-        plist_t path_node = plist_dict_get_item(item, "path");
-        plist_t fmt_node = plist_dict_get_item(item, "st_ifmt");
-        char *size = NULL;
+        plist_get_string_val(plist_dict_get_item(item, "path"), &path);
+        plist_get_string_val(plist_dict_get_item(item, "st_ifmt"), &fmt);
         plist_get_string_val(plist_dict_get_item(item, "st_size"), &size);
         long fsize = atol(size);
-        char *fmt = NULL;
-        plist_get_string_val(fmt_node, &fmt);
-        plist_get_string_val(path_node, &path);
-        char newPath[PATH_MAX];
-        char sys[PATH_MAX];
+        char newPath[PATH_MAX], sys[PATH_MAX];
         
         if (strcmp(fmt, "S_IFDIR") == 0) {
             sprintf(newPath,"%s/%s/",dst, path);
@@ -577,7 +554,7 @@ int clone_afc_path(afc_client_t afc, const char *src, const char *dst) {
            
             sprintf(newPath,"%s/%s",dst, path);
             char *dir = dirname(path);
-            if (!fileExists(dir)){
+            if (!fileExists(dir)) {
                 char sys[PATH_MAX];
                 sprintf(sys, "/bin/mkdir -p %s", dir);
                 system(sys);
@@ -600,7 +577,7 @@ int clone_afc_path(afc_client_t afc, const char *src, const char *dst) {
                     while((err=afc_file_read(afc, handle, buf, CHUNKSZ, &bytes_read)) == AFC_E_SUCCESS && bytes_read > 0) {
                         totbytes += fwrite(buf, 1, bytes_read, outf);
                         if (fsize > 0){
-                            loadBar(totbytes, fsize, 100, 50,basename((char*)src));
+                            loadBar(totbytes, fsize, 50,basename((char*)newPath));
                         }
                     }
                     fclose(outf);
@@ -617,16 +594,9 @@ int clone_afc_path(afc_client_t afc, const char *src, const char *dst) {
                 }
                 
                 afc_file_close(afc, handle);
-                /*
-                 
-                 i assume you need to wait till afc_file_close to actually delete a file
-                 
-                 TODO: make it so if we are done with a folder and it is empty, we clear it out!
-                 
-                 */
-                if (ret == EXIT_SUCCESS) {
-                    if (clean == true)
-                    {
+                // i assume you need to wait till afc_file_close to actually delete a file
+                 if (ret == EXIT_SUCCESS) {
+                    if (clean == true) {
                         fprintf(stderr, "File cloned successfully, clearing original: %s\n", path);
                         rm_file(afc, (char*)path);
                     }
@@ -638,9 +608,6 @@ int clone_afc_path(afc_client_t afc, const char *src, const char *dst) {
             
         }
     }
-    
-    
-    
     return ret;
 }
 
@@ -651,7 +618,6 @@ int export_shallow_folder(afc_client_t afc, const char *src, const char *dst) {
         fprintf(stderr, "[debug] exporting %s to %s - creating afc file connection\n", src, dst);
     
     plist_t fileList = afc_list_path(afc, src, false);
-    
     int fileCount = plist_array_get_size(fileList);
     
     if (idev_verbose)
@@ -691,7 +657,7 @@ int export_shallow_folder(afc_client_t afc, const char *src, const char *dst) {
                     while((err=afc_file_read(afc, handle, buf, CHUNKSZ, &bytes_read)) == AFC_E_SUCCESS && bytes_read > 0) {
                         totbytes += fwrite(buf, 1, bytes_read, outf);
                         if (fsize > 0){
-                            loadBar(totbytes, fsize, 100, 50,basename((char*)src));
+                            loadBar(totbytes, fsize, 50,basename((char*)src));
                         }
                     }
                     fclose(outf);
@@ -759,7 +725,7 @@ int get_afc_path(afc_client_t afc, const char *src, const char *dst) {
             while((err=afc_file_read(afc, handle, buf, CHUNKSZ, &bytes_read)) == AFC_E_SUCCESS && bytes_read > 0) {
                 totbytes += fwrite(buf, 1, bytes_read, outf);
                 if (fsize > 0){
-                    loadBar(totbytes, fsize, 100, 50,basename((char*)src));
+                    loadBar(totbytes, fsize, 50,basename((char*)src));
                 }
             }
             fclose(outf);
@@ -818,7 +784,7 @@ int put_afc_path(afc_client_t afc, const char *src, const char *dst) {
                 uint32_t bytes_written=0;
                 err=afc_file_write(afc, handle, buf, (uint32_t)bytes_read, &bytes_written);
                 totbytes += bytes_written;
-                loadBar(totbytes, fsize, 100, 50,basename((char*)src));
+                loadBar(totbytes, fsize, 50,basename((char*)src));
             }
             
             if (err) {
@@ -1114,7 +1080,6 @@ int cmd_main(afc_client_t afc, int argc, char **argv) {
         char *output = argv[2];
         ret = export_shallow_folder(afc, input, output);
     }  else if (!strcmp(cmd, "clone")) {
-        //printf("argc: %i\n", argc);
         if (argc >=3){
             char *input = argv[1];
             char *output = argv[2];
@@ -1123,8 +1088,7 @@ int cmd_main(afc_client_t afc, int argc, char **argv) {
             ret = -1;
             printf("clone requires an appid to be set!\n");
         } else {
-            char *output = argv[1];
-            ret = clone_afc_path(afc, "Documents", output);
+            ret = clone_afc_path(afc, "Documents", ".");
         }
     } else if (!strcmp(cmd, "documents"))
     {
@@ -1145,10 +1109,10 @@ int cmd_main(afc_client_t afc, int argc, char **argv) {
     return ret;
 }
 
-#define OPTION_FLAGS "rs:a:u:vhlcRAfx"
+#define OPTION_FLAGS "rs:a:u:vhlcRAfxq"
 void usage(FILE *outf) {
     fprintf(outf,
-            "Usage: %s %.1f [%s] command cmdargs...\n\n"
+            "Usage: %s %s [%s] command cmdargs...\n\n"
             "  Options:\n"
             "    -r, --root                 Use the afc2 server if jailbroken (ignored with -a)\n"
             "    -s, --service=NAME>        Use the specified lockdown service (ignored with -a)\n"
@@ -1157,10 +1121,11 @@ void usage(FILE *outf) {
             "    -v, --verbose              Enable verbose debug messages\n"
             "    -h, --help                 Display this help message\n"
             "    -l, --list                 List devices\n"
-            "    -A, --apps                 List installed Applications (only applicable when listing applications)\n"
-            "    -f, --filesharing          List Only Applications that have file sharing enabled\n"
+            "    -A, --apps                 List installed Applications\n"
+            "    -f, --filesharing          List Only Applications that have file sharing enabled (only applicable when listing applications)\n"
             "    -x, --xml                  Output file/application lists in XML format\n"
             "    -R, --recursive            List the specified folder recursively\n"
+            "    -q, --quiet                Don't show the progress bar when applicable (putting/getting/cloning files)\n"
             "    -c, --clean                Cleans out folder after exporting/cloning\n\n"
             
             "  Where \"command\" and \"cmdargs...\" are as follows:\n\n"
@@ -1168,7 +1133,7 @@ void usage(FILE *outf) {
             "    clone  [localpath]         clone app Documents folder into a local folder. (requires appid)\n"
             "    clone  [path] [localpath]  clone directory folder into a local folder. (requires path and localpath)\n"
             "    export [path] [localpath]  export a specific directory to a local one (not recursive)\n"
-            "    documents                  recursive plist formatted list of entire ~/Documents folder (requires appid)\n\n"
+            "    documents                  recursive plist formatted list of entire application Documents folder (requires appid)\n\n"
             "  Standard afcclient commands:\n\n"
             "    devinfo                    dump device info from AFC server\n"
             "    list <dir> [dir2...]       list remote directory contents\n"
@@ -1198,6 +1163,7 @@ static struct option longopts[] = {
     { "apps",       no_argument,            NULL,   'A' },
     { "xml",        no_argument,            NULL,   'x' },
     { "filesharing",no_argument,            NULL,   'f' },
+    { "quiet",      no_argument,            NULL,   'q' },
     { NULL,         0,                      NULL,   0 }
 };
 
@@ -1207,6 +1173,7 @@ int main(int argc, char **argv) {
     root = false;
     udid = NULL;
     appMode = false;
+    quiet = false;
     char *appid=NULL, *svcname=NULL;;
     hasAppID = false;
     clean = false;
@@ -1270,6 +1237,10 @@ int main(int argc, char **argv) {
                 
             case 'A':
                 appMode = true;
+                break;
+                
+            case 'q':
+                quiet = true;
                 break;
                 
             default:

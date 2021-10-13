@@ -53,7 +53,7 @@ LIBGMMD_EXPORT plist_t * afc_list_path(afc_client_t afc, const char *path, int8_
 LIBGMMD_EXPORT int get_afc_path(afc_client_t afc, const char *src, const char *dst);
 LIBGMMD_EXPORT int put_afc_path(afc_client_t afc, const char *src, const char *dst);
 LIBGMMD_EXPORT int clone_afc_path(afc_client_t afc, const char *src, const char *dst);
-LIBGMMD_EXPORT double AFVersionNumber;
+LIBGMMD_EXPORT char * AFVersionNumber;
     
 #ifdef __cplusplus
 }

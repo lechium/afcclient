@@ -1,7 +1,7 @@
 CC=clang
 CFLAGS=-Iinclude -Ilibimobiledevice -Iplist -mmacosx-version-min=10.13
 LDFLAGS=-limobiledevice-1.0 -lplist-2.0 -Iinclude -Ilibimobiledevice -Iplist -L. -Lstatic -I/usr/local/include -lusbmuxd-2.0 -limobiledevice-glue-1.0 -lssl -lcrypto
-
+PREFIX=/usr/local
 OS := $(shell uname)
 ifeq ($(OS),Darwin)
   # Nothing special needed for MacOS
@@ -18,6 +18,10 @@ endif
 
 
 TARGETS=afcclient
+
+install: afcclient
+	install -d $(DESTDIR)$(PREFIX)/bin
+	install -m 755 afcclient $(DESTDIR)$(PREFIX)/bin/
 
 all: $(TARGETS)
 
