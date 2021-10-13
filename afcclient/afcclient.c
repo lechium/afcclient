@@ -73,7 +73,7 @@ static inline void loadBar(off_t currentValue, off_t totalValue, int width,const
     float ratio = currentValue/(float)totalValue;
     int   elapsed     = ratio * width;
     // Show the percentage complete.
-    printf("%3d%% [", (int)(ratio*100) );
+    printf("%3d%% [", (int)(ratio*100));
     
     // Show the load bar.
     for (int x=0; x<elapsed; x++)
@@ -84,7 +84,7 @@ static inline void loadBar(off_t currentValue, off_t totalValue, int width,const
     
     // ANSI Control codes to go back to the
     // previous line and clear it.
-    printf("] %.0lld/%.0lld MB <%s>\n\033[F\033[J",currentValue/1024/1024,totalValue/1024/1024,fileName);
+    printf("] %.0lld/%.0lldMB <%s>\n\033[F\033[J",currentValue/1024/1024,totalValue/1024/1024,fileName);
 }
 
 bool fileExists(const char* file) {
@@ -977,6 +977,15 @@ int do_get(afc_client_t afc, int argc, char **argv) {
     return ret;
 }
 
+int do_puts(afc_client_t afc, int argc, char **argv) {
+    int ret=EXIT_FAILURE;
+    for (int i=1; i<argc ; i++) {
+        printf("processing %s\n", argv[i]);
+        ret |= put_afc_path(afc, argv[i], basename(argv[1]));
+    }
+    return ret;
+}
+
 int do_put(afc_client_t afc, int argc, char **argv) {
     int ret=EXIT_FAILURE;
     
@@ -984,8 +993,8 @@ int do_put(afc_client_t afc, int argc, char **argv) {
         ret = put_afc_path(afc, argv[1], basename(argv[1]));
     } else if (argc == 3) {
         ret = put_afc_path(afc, argv[1], argv[2]);
-    } else {
-        fprintf(stderr, "Error: invalid number of arguments for put command.\n");
+    } else if (argc > 3){
+        do_puts(afc, argc, argv);
     }
     
     return ret;
@@ -1051,18 +1060,16 @@ int cmd_main(afc_client_t afc, int argc, char **argv) {
     }
     else if (!strcmp(cmd, "symlink")) {
         ret = do_symlink(afc, argc, argv);
-    }
-    else if (!strcmp(cmd, "cat")) {
+    } else if (!strcmp(cmd, "cat")) {
         ret = do_cat(afc, argc, argv);
-    }
-    else if (!strcmp(cmd, "get")) {
+    } else if (!strcmp(cmd, "get")) {
         ret = do_get(afc, argc, argv);
-    }
-    else if (!strcmp(cmd, "put")) {
+    } else if (!strcmp(cmd, "put")) {
         ret = do_put(afc, argc, argv);
         
         //kevins additions
-        
+    } else if (!strcmp(cmd, "puts")) {
+        ret = do_puts(afc, argc, argv);
     } else if (!strcmp(cmd, "export")) {
         char *input = argv[1];
         char *output = argv[2];
@@ -1102,38 +1109,39 @@ void usage(FILE *outf) {
     fprintf(outf,
             "Usage: %s %s [%s] command cmdargs...\n\n"
             "  Options:\n"
-            "    -r, --root                 Use the afc2 server if jailbroken (ignored with -a)\n"
-            "    -s, --service=NAME>        Use the specified lockdown service (ignored with -a)\n"
-            "    -a, --appid=<APP-ID>       Access bundle directory for app-id\n"
-            "    -u, --uuid=<UDID>          Specify the device udid\n"
-            "    -v, --verbose              Enable verbose debug messages\n"
-            "    -h, --help                 Display this help message\n"
-            "    -l, --list                 List devices\n"
-            "    -A, --apps                 List installed Applications\n"
-            "    -f, --filesharing          List Only Applications that have file sharing enabled (only applicable when listing applications)\n"
-            "    -x, --xml                  Output file/application lists in XML format\n"
-            "    -R, --recursive            List the specified folder recursively\n"
-            "    -q, --quiet                Don't show the progress bar when applicable (putting/getting/cloning files)\n"
-            "    -c, --clean                Cleans out folder after exporting/cloning\n\n"
+            "    -r, --root                       Use the afc2 server if jailbroken (ignored with -a)\n"
+            "    -s, --service=NAME>              Use the specified lockdown service (ignored with -a)\n"
+            "    -a, --appid=<APP-ID>             Access bundle directory for app-id\n"
+            "    -u, --uuid=<UDID>                Specify the device udid\n"
+            "    -v, --verbose                    Enable verbose debug messages\n"
+            "    -h, --help                       Display this help message\n"
+            "    -l, --list                       List devices\n"
+            "    -A, --apps                       List installed Applications\n"
+            "    -f, --filesharing                List Only Applications that have file sharing enabled (only applicable when listing applications)\n"
+            "    -x, --xml                        Output file/application lists in XML format\n"
+            "    -R, --recursive                  List the specified folder recursively\n"
+            "    -q, --quiet                      Don't show the progress bar when applicable (putting/getting/cloning files)\n"
+            "    -c, --clean                      Cleans out folder after exporting/cloning\n\n"
             
             "  Where \"command\" and \"cmdargs...\" are as follows:\n\n"
             "  New commands:\n\n"
-            "    clone  [localpath]         clone app Documents folder into a local folder. (requires appid)\n"
-            "    clone  [path] [localpath]  clone directory folder into a local folder. (requires path and localpath)\n"
-            "    export [path] [localpath]  export a specific directory to a local one (not recursive)\n"
-            "    documents                  recursive plist formatted list of entire application Documents folder (requires appid)\n\n"
+            "    clone  [localpath]               clone app Documents folder into a local folder. (requires appid)\n"
+            "    clone  [path] [localpath]        clone directory folder into a local folder. (requires path and localpath)\n"
+            "    export [path] [localpath]        export a specific directory to a local one (not recursive)\n"
+            "    documents                        recursive plist formatted list of entire application Documents folder (requires appid)\n\n"
             "  Standard afcclient commands:\n\n"
-            "    devinfo                    dump device info from AFC server\n"
-            "    list <dir> [dir2...]       list remote directory contents\n"
-            "    info <path> [path2...]     dump remote file information\n"
-            "    mkdir <path> [path2...]    create directory at path\n"
-            "    rm <path> [path2...]       remove directory at path\n"
-            "    rename <from> <to>         rename path 'from' to path 'to'\n"
-            "    link <target> <link>       create a hard-link from 'link' to 'target'\n"
-            "    symlink <target> <link>    create a symbolic-link from 'link' to 'target'\n"
-            "    cat <path>                 cat contents of <path> to stdout\n"
-            "    get <path> [localpath]     download a file (default: current dir)\n"
-            "    put <localpath> [path]     upload a file (default: remote top-level dir)\n\n"
+            "    devinfo                          dump device info from AFC server\n"
+            "    list <dir> [dir2...]             list remote directory contents\n"
+            "    info <path> [path2...]           dump remote file information\n"
+            "    mkdir <path> [path2...]          create directory at path\n"
+            "    rm <path> [path2...]             remove directory at path\n"
+            "    rename <from> <to>               rename path 'from' to path 'to'\n"
+            "    link <target> <link>             create a hard-link from 'link' to 'target'\n"
+            "    symlink <target> <link>          create a symbolic-link from 'link' to 'target'\n"
+            "    cat <path>                       cat contents of <path> to stdout\n"
+            "    get <path> [localpath]           download a file (default: current dir)\n"
+            "    put <localpath> [path]           upload a file (default: remote top-level dir)\n"
+            "    puts <localpath> [localpath2...] upload multiple files to remote top-level dir\n\n"
             , progname, AFVersionNumber, OPTION_FLAGS);
 }
 
