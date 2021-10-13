@@ -59,7 +59,7 @@ bool fs; //output only apps that have file sharing capabilities
 char *udid;
 bool appMode;
 bool quiet;
-
+int _relativeYear;
 char * AFVersionNumber = "1.0.1";
 
 void usage(FILE *outf);
@@ -116,12 +116,24 @@ int dump_afc_device_info(afc_client_t afc) {
     return ret;
 }
 
+int currentRelativeYear() {
+    time_t rawtime;
+    struct tm *info;
+    time( &rawtime );
+    info = localtime( &rawtime );
+    return info->tm_year;
+}
+
 void epochToTime(long epoch, char* s) {
     const time_t rawtime = epoch/1000000000;
     struct tm * dt;
     dt = localtime(&rawtime);
     char slocal[100];
-    strftime(slocal,sizeof(slocal),"%b %d %G %R", dt);
+    if (dt->tm_year != _relativeYear){
+        strftime(slocal,sizeof(slocal),"%b %d  %G", dt);
+    } else {
+        strftime(slocal,sizeof(slocal),"%b %d %R", dt);
+    }
     strncpy(s, slocal, 99);
     s[99] = '\0';
 }
@@ -1169,6 +1181,7 @@ static struct option longopts[] = {
 
 int main(int argc, char **argv) {
     progname = basename(argv[0]);
+    _relativeYear = currentRelativeYear();
     recursiveList = false;
     root = false;
     udid = NULL;
