@@ -243,6 +243,8 @@
 		8933D64D1A1E7F1C009182A9 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = x86_64;
+				EXCLUDED_ARCHS = arm64;
 				HEADER_SEARCH_PATHS = (
 					$SRCROOT/afcclient/libimobiledevice,
 					$SRCROOT/afcclient/include,
@@ -261,6 +263,8 @@
 		8933D64E1A1E7F1C009182A9 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = x86_64;
+				EXCLUDED_ARCHS = arm64;
 				HEADER_SEARCH_PATHS = (
 					$SRCROOT/afcclient/libimobiledevice,
 					$SRCROOT/afcclient/include,
